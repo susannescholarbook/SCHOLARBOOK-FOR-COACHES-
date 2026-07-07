@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Coaches | Scholarbook</title>
+  <meta name="description" content="Browse verified international student-athletes for NCAA, NAIA, and JUCO programs. Filter by sport, division, and academic profile.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="page-bg" class="page-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="navbar">
+      <a href="https://www.scholarbook.net/en/de" class="brand" target="_blank" rel="noopener">
+        <span class="brand-mark" aria-hidden="true">SB</span>
+        <span class="brand-text">Scholarbook</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">For Athletes</a></li>
+        <li><a href="#" class="active" aria-current="page">For Coaches</a></li>
+        <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">About Us</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero hero--slant" aria-labelledby="hero-title">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">For</p>
+      <h1 id="hero-title" class="hero-title">Coaches</h1>
+      <p class="hero-lead">
+        Meet vetted international student-athletes, ready to compete for your program starting Fall 2026.
+      </p>
+    </div>
+  </section>
+
+  <section class="intro intro--slant" aria-labelledby="intro-title">
+    <div class="intro-inner">
+      <p class="section-eyebrow">Get to know</p>
+      <h2 id="intro-title" class="section-title">Our Athletes</h2>
+      <p class="section-copy">
+        Browse verified prospects across nearly every NCAA-recognized sport. Use the filters to find athletes who fit your roster needs.
+      </p>
+    </div>
+  </section>
+
+  <main class="portal" id="athletes-portal">
+    <aside class="filters" aria-label="Athlete filters">
+      <h3 class="filters-title">Select your filters</h3>
+
+      <div class="filter-group">
+        <label class="filter-label" for="filter-search">Search</label>
+        <input type="search" id="filter-search" class="filter-search" placeholder="Position, region, or club" autocomplete="off">
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label" for="filter-sport">Sport</label>
+        <div class="select-wrap">
+          <select id="filter-sport" name="sport">
+            <option value="">All sports</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Gender</span>
+        <div class="toggle-group" role="group" aria-label="Gender">
+          <button type="button" class="toggle-btn" data-filter="gender" data-value="Female">Female</button>
+          <button type="button" class="toggle-btn" data-filter="gender" data-value="Male">Male</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Coaching Division</span>
+        <div class="pill-group" id="filter-division" role="group" aria-label="Coaching division">
+          <button type="button" class="pill" data-value="NCAA Div 1">NCAA Div 1</button>
+          <button type="button" class="pill" data-value="NCAA Div 2">NCAA Div 2</button>
+          <button type="button" class="pill" data-value="NAIA">NAIA</button>
+          <button type="button" class="pill" data-value="JUCO">JUCO</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Academic Status</span>
+        <div class="pill-group" id="filter-status" role="group" aria-label="Academic status">
+          <button type="button" class="pill" data-value="Freshman">Freshman</button>
+          <button type="button" class="pill" data-value="Transfer">Transfer</button>
+          <button type="button" class="pill" data-value="Graduate">Graduate</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Start of Studies</span>
+        <div class="pill-group pill-group--stack" id="filter-start" role="group" aria-label="Start of studies">
+          <button type="button" class="pill" data-value="Fall 2026">Fall 2026</button>
+          <button type="button" class="pill" data-value="Spring 2027">Spring 2027</button>
+          <button type="button" class="pill" data-value="Fall 2027">Fall 2027</button>
+          <button type="button" class="pill" data-value="Spring 2028">Spring 2028</button>
+          <button type="button" class="pill" data-value="Fall 2028">Fall 2028</button>
+          <button type="button" class="pill" data-value="Spring 2029">Spring 2029</button>
+          <button type="button" class="pill" data-value="Fall 2029">Fall 2029</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-clear" id="filter-clear">Clear search</button>
+    </aside>
+
+    <section class="results" aria-live="polite">
+      <div class="results-header">
+        <p class="results-count">Showing <strong id="results-count">0</strong> athletes</p>
+        <div class="results-controls">
+          <label class="sort-label" for="sort-by">Sort by</label>
+          <div class="select-wrap select-wrap--inline">
+            <select id="sort-by" name="sort">
+              <option value="updated">Last updated</option>
+              <option value="gpa">GPA (high to low)</option>
+              <option value="start">Start year</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="athletes-grid" id="athletes-grid"></div>
+    </section>
+  </main>
+
+  <section class="trust trust--logos" aria-labelledby="trust-logos-title">
+    <div class="trust-inner">
+      <h2 id="trust-logos-title" class="trust-title">Where our athletes compete</h2>
+      <p class="trust-subtitle">Scholarbook athletes have joined programs across NCAA Div I, Div II, NAIA, and JUCO.</p>
+      <ul class="logo-grid" aria-label="Partner universities">
+        <li><span class="uni-logo">Stanford</span></li>
+        <li><span class="uni-logo">UCLA</span></li>
+        <li><span class="uni-logo">Michigan</span></li>
+        <li><span class="uni-logo">Florida State</span></li>
+        <li><span class="uni-logo">Georgetown</span></li>
+        <li><span class="uni-logo">Oregon</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="trust trust--testimonials" aria-labelledby="trust-quotes-title">
+    <div class="trust-inner">
+      <h2 id="trust-quotes-title" class="trust-title">What coaches say</h2>
+      <div class="testimonial-grid">
+        <blockquote class="testimonial">
+          <p>&ldquo;Scholarbook profiles gave us everything we needed — academics, video, and verified stats — before we ever got on a call.&rdquo;</p>
+          <footer>— <cite>Head Coach, NCAA Div II Soccer</cite></footer>
+        </blockquote>
+        <blockquote class="testimonial">
+          <p>&ldquo;The quality of international prospects is consistently high. We signed two starters from their Fall 2025 cohort.&rdquo;</p>
+          <footer>— <cite>Associate Head Coach, NAIA Basketball</cite></footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust trust--stories" aria-labelledby="trust-stories-title">
+    <div class="trust-inner">
+      <h2 id="trust-stories-title" class="trust-title">Recent placements</h2>
+      <ul class="story-list">
+        <li class="story-card"><span class="story-athlete">Emma S.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Soccer, Fall 2025</span></li>
+        <li class="story-card"><span class="story-athlete">Niklas H.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">NAIA Basketball, Fall 2025</span></li>
+        <li class="story-card"><span class="story-athlete">Sarah L.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Track &amp; Field, Fall 2024</span></li>
+        <li class="story-card"><span class="story-athlete">Finn W.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Rowing, Fall 2025</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p><strong>4,600+</strong> athletes placed with U.S. college programs · Questions? <a href="mailto:team@scholarbook.net">team@scholarbook.net</a></p>
+    <p class="footer-note">Looking to recruit international talent? <a href="mailto:team@scholarbook.net">Contact our recruiting team</a> or explore athlete profiles above.</p>
+  </footer>
+
+  <!-- Profile detail modal -->
+  <dialog class="modal profile-modal" id="profile-modal" aria-labelledby="profile-modal-title">
+    <div class="modal-panel">
+      <button type="button" class="modal-close" id="profile-close" aria-label="Close profile">×</button>
+      <div id="profile-content"></div>
+    </div>
+  </dialog>
+
+  <!-- Contact modal -->
+  <dialog class="modal recruit-modal" id="recruit-modal" aria-labelledby="recruit-modal-title">
+    <div class="modal-panel modal-panel--compact">
+      <button type="button" class="modal-close" id="recruit-close" aria-label="Close form">×</button>
+      <h2 id="recruit-modal-title" class="modal-title">Contact about athlete</h2>
+      <p class="modal-subtitle">Your inquiry goes straight to our recruiting team — expect a reply within 24 hours.</p>
+      <p class="recruit-athlete-name" id="recruit-athlete-label"></p>
+      <form id="recruit-form" class="recruit-form">
+        <div class="form-field">
+          <label for="coach-university">University <span class="required">*</span></label>
+          <input type="text" id="coach-university" name="coach_university" required autocomplete="organization" placeholder="University of Example">
+        </div>
+        <div class="form-field">
+          <label for="coach-email">Your email address <span class="required">*</span></label>
+          <input type="email" id="coach-email" name="coach_email" required autocomplete="email" placeholder="coach@university.edu">
+        </div>
+        <div class="form-field">
+          <label for="coach-phone">Phone or WhatsApp <span class="optional">(optional)</span></label>
+          <input type="tel" id="coach-phone" name="coach_phone" autocomplete="tel" placeholder="+1 555 000 0000">
+        </div>
+        <div class="form-field">
+          <label for="coach-message">Message <span class="optional">(optional)</span></label>
+          <textarea id="coach-message" name="coach_message" rows="4" placeholder="Tell us about your program, roster needs, or questions about this athlete…"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Send inquiry</button>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Inline highlight reel player -->
+  <dialog class="modal video-modal" id="video-modal" aria-labelledby="video-modal-title">
+    <div class="modal-panel modal-panel--video">
+      <button type="button" class="modal-close" id="video-close" aria-label="Close video">×</button>
+      <h2 id="video-modal-title" class="visually-hidden">Highlight Reel</h2>
+      <div class="video-embed-wrap" id="video-embed"></div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
