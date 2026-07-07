@@ -7,7 +7,7 @@
   <meta name="description" content="Browse verified international student-athletes for NCAA, NAIA, and JUCO programs. Filter by sport, division, and academic profile.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=Yellowtail&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,9 +15,8 @@
 
   <header class="site-header">
     <nav class="navbar">
-      <a href="https://www.scholarbook.net/en/de" class="brand" target="_blank" rel="noopener">
-        <span class="brand-mark" aria-hidden="true">SB</span>
-        <span class="brand-text">Scholarbook</span>
+      <a href="https://www.scholarbook.net/en/de" class="brand" target="_blank" rel="noopener" aria-label="Scholarbook">
+        <img src="Images/Scholarbook_Logo_Farbe%20breit%204c.jpg" alt="Scholarbook">
       </a>
       <ul class="nav-links">
         <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">For Athletes</a></li>
@@ -27,22 +26,16 @@
     </nav>
   </header>
 
-  <section class="hero hero--slant" aria-labelledby="hero-title">
+  <section class="hero" aria-labelledby="hero-title">
     <div class="hero-inner">
-      <p class="hero-eyebrow">For</p>
-      <h1 id="hero-title" class="hero-title">Coaches</h1>
+      <p class="hero-eyebrow">For Coaches</p>
+      <h1 id="hero-title" class="hero-title">
+        <span class="hero-line">Get to know</span>
+        <span class="hero-line hero-line--gold">Our Athletes.</span>
+      </h1>
+      <p class="hero-script">one team. one goal.</p>
       <p class="hero-lead">
-        Meet vetted international student-athletes, ready to compete for your program starting Fall 2026.
-      </p>
-    </div>
-  </section>
-
-  <section class="intro intro--slant" aria-labelledby="intro-title">
-    <div class="intro-inner">
-      <p class="section-eyebrow">Get to know</p>
-      <h2 id="intro-title" class="section-title">Our Athletes</h2>
-      <p class="section-copy">
-        Browse verified prospects across nearly every NCAA-recognized sport. Use the filters to find athletes who fit your roster needs.
+        Meet vetted international student-athletes, ready to compete for your program starting Fall 2026. Use the filters below to find athletes who fit your roster needs.
       </p>
     </div>
   </section>
@@ -146,12 +139,12 @@
       <h2 id="trust-quotes-title" class="trust-title">What coaches say</h2>
       <div class="testimonial-grid">
         <blockquote class="testimonial">
-          <p>&ldquo;Scholarbook profiles gave us everything we needed — academics, video, and verified stats — before we ever got on a call.&rdquo;</p>
-          <footer>— <cite>Head Coach, NCAA Div II Soccer</cite></footer>
+          <p>&ldquo;Scholarbook profiles gave us everything we needed &mdash; academics, video, and verified stats &mdash; before we ever got on a call.&rdquo;</p>
+          <footer>&mdash; <cite>Head Coach, NCAA Div II Soccer</cite></footer>
         </blockquote>
         <blockquote class="testimonial">
           <p>&ldquo;The quality of international prospects is consistently high. We signed two starters from their Fall 2025 cohort.&rdquo;</p>
-          <footer>— <cite>Associate Head Coach, NAIA Basketball</cite></footer>
+          <footer>&mdash; <cite>Associate Head Coach, NAIA Basketball</cite></footer>
         </blockquote>
       </div>
     </div>
@@ -161,23 +154,65 @@
     <div class="trust-inner">
       <h2 id="trust-stories-title" class="trust-title">Recent placements</h2>
       <ul class="story-list">
-        <li class="story-card"><span class="story-athlete">Emma S.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Soccer, Fall 2025</span></li>
-        <li class="story-card"><span class="story-athlete">Niklas H.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">NAIA Basketball, Fall 2025</span></li>
-        <li class="story-card"><span class="story-athlete">Sarah L.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Track &amp; Field, Fall 2024</span></li>
-        <li class="story-card"><span class="story-athlete">Finn W.</span> <span class="story-arrow" aria-hidden="true">→</span> <span class="story-outcome">Div I Rowing, Fall 2025</span></li>
+        <li class="story-card"><span class="story-athlete">Emma S.</span> <span class="story-arrow" aria-hidden="true">&rarr;</span> <span class="story-outcome">Div I Soccer, Fall 2025</span></li>
+        <li class="story-card"><span class="story-athlete">Niklas H.</span> <span class="story-arrow" aria-hidden="true">&rarr;</span> <span class="story-outcome">NAIA Basketball, Fall 2025</span></li>
+        <li class="story-card"><span class="story-athlete">Sarah L.</span> <span class="story-arrow" aria-hidden="true">&rarr;</span> <span class="story-outcome">Div I Track &amp; Field, Fall 2024</span></li>
+        <li class="story-card"><span class="story-athlete">Finn W.</span> <span class="story-arrow" aria-hidden="true">&rarr;</span> <span class="story-outcome">Div I Rowing, Fall 2025</span></li>
       </ul>
     </div>
   </section>
 
   <footer class="site-footer">
-    <p><strong>4,600+</strong> athletes placed with U.S. college programs · Questions? <a href="mailto:team@scholarbook.net">team@scholarbook.net</a></p>
-    <p class="footer-note">Looking to recruit international talent? <a href="mailto:team@scholarbook.net">Contact our recruiting team</a> or explore athlete profiles above.</p>
+    <div class="footer-main">
+      <div class="footer-left">
+        <img class="footer-logo" src="Images/Scholarbook_Logo_Farbe%20breit%204c.jpg" alt="Scholarbook">
+        <p class="footer-tagline"><strong>4,600+</strong> athletes placed with U.S. college programs.</p>
+        <p class="footer-heading">If you have any questions, we are here:</p>
+        <p class="footer-contact">
+          Tel.: <a href="tel:+4972161932420">+49 721 619 324 20</a><br>
+          Mail: <a href="mailto:team@scholarbook.net">team@scholarbook.net</a>
+        </p>
+        <div class="footer-social">
+          <a href="https://www.youtube.com/@scholarbook" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/scholarbook" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.8-.4 2.2a3.8 3.8 0 0 1-.9 1.4 3.8 3.8 0 0 1-1.4.9c-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.2-2.2-.4a3.8 3.8 0 0 1-1.4-.9 3.8 3.8 0 0 1-.9-1.4c-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1zm0 2c-3.2 0-3.5 0-4.8.1-.9 0-1.4.2-1.7.3-.4.2-.7.3-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.7-.1 1.3-.1 1.6-.1 4.8s0 3.5.1 4.8c0 .9.2 1.4.3 1.7.2.4.3.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.7.3 1.3.1 1.6.1 4.8.1s3.5 0 4.8-.1c.9 0 1.4-.2 1.7-.3.4-.2.7-.3 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.7.1-1.3.1-1.6.1-4.8s0-3.5-.1-4.8c0-.9-.2-1.4-.3-1.7-.2-.4-.3-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.7-.3-1.3-.1-1.6-.1-4.8-.1zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 2a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8zm5.6-2.2a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/scholarbook" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.6-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.3l-.5 3.5h-2.8v8.4A12 12 0 0 0 24 12z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="rating-row">
+          <span class="google-wordmark">Google</span>
+          <span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="rating-value">4,8 / 5</span>
+        </div>
+        <div class="rating-row">
+          <svg class="pe-check" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm-1.8 17.2-4.6-4.6 1.7-1.7 2.9 2.9 6.5-6.5 1.7 1.7-8.2 8.2z"/></svg>
+          <span class="pe-wordmark"><strong>Proven</strong>Expert</span>
+          <span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span class="rating-value">5 / 5</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <ul class="footer-links">
+        <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">Legal Notice</a></li>
+        <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">Data Protection</a></li>
+        <li><a href="https://www.scholarbook.net/en/de" target="_blank" rel="noopener">Contract Termination</a></li>
+        <li><a href="#" aria-current="page">For Coaches</a></li>
+      </ul>
+      <p class="footer-copy">&copy; All rights reserved Copyright Scholarbook</p>
+    </div>
   </footer>
 
   <!-- Profile detail modal -->
   <dialog class="modal profile-modal" id="profile-modal" aria-labelledby="profile-modal-title">
     <div class="modal-panel">
-      <button type="button" class="modal-close" id="profile-close" aria-label="Close profile">×</button>
+      <button type="button" class="modal-close" id="profile-close" aria-label="Close profile">&times;</button>
       <div id="profile-content"></div>
     </div>
   </dialog>
@@ -185,9 +220,9 @@
   <!-- Contact modal -->
   <dialog class="modal recruit-modal" id="recruit-modal" aria-labelledby="recruit-modal-title">
     <div class="modal-panel modal-panel--compact">
-      <button type="button" class="modal-close" id="recruit-close" aria-label="Close form">×</button>
+      <button type="button" class="modal-close" id="recruit-close" aria-label="Close form">&times;</button>
       <h2 id="recruit-modal-title" class="modal-title">Contact about athlete</h2>
-      <p class="modal-subtitle">Your inquiry goes straight to our recruiting team — expect a reply within 24 hours.</p>
+      <p class="modal-subtitle">Your inquiry goes straight to our recruiting team &mdash; expect a reply within 24 hours.</p>
       <p class="recruit-athlete-name" id="recruit-athlete-label"></p>
       <form id="recruit-form" class="recruit-form">
         <div class="form-field">
@@ -204,7 +239,7 @@
         </div>
         <div class="form-field">
           <label for="coach-message">Message <span class="optional">(optional)</span></label>
-          <textarea id="coach-message" name="coach_message" rows="4" placeholder="Tell us about your program, roster needs, or questions about this athlete…"></textarea>
+          <textarea id="coach-message" name="coach_message" rows="4" placeholder="Tell us about your program, roster needs, or questions about this athlete&hellip;"></textarea>
         </div>
         <button type="submit" class="btn-primary">Send inquiry</button>
       </form>
@@ -214,11 +249,15 @@
   <!-- Inline highlight reel player -->
   <dialog class="modal video-modal" id="video-modal" aria-labelledby="video-modal-title">
     <div class="modal-panel modal-panel--video">
-      <button type="button" class="modal-close" id="video-close" aria-label="Close video">×</button>
+      <button type="button" class="modal-close" id="video-close" aria-label="Close video">&times;</button>
       <h2 id="video-modal-title" class="visually-hidden">Highlight Reel</h2>
       <div class="video-embed-wrap" id="video-embed"></div>
     </div>
   </dialog>
+
+  <button type="button" class="scroll-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 9l7 7H5z" transform="translate(0 -2)"/></svg>
+  </button>
 
   <script src="app.js"></script>
 </body>

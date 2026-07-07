@@ -1,17 +1,28 @@
-/* Scholarbook For Coaches — design system */
+/* Scholarbook For Coaches — marketing design system */
 :root {
+  --sb-blue-ink: #050f2d;
+  --sb-blue-deep: #081c4e;
+  --sb-blue: #123a9e;
+  --sb-royal: #1e57d6;
+  --sb-gold: #e1c165;
+  --sb-gold-light: #e1c165;
+  --sb-gold-deep: #e1c165;
   --sb-off-white: #f6fcff;
   --sb-navy-deep: #07293e;
   --sb-navy: #233364;
   --sb-pink: #e40b49;
   --sb-sky: #5ec6e8;
+  --sb-white: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.78);
+  --line-soft: rgba(255, 255, 255, 0.16);
 
-  --font-display: "Montserrat", system-ui, sans-serif;
-  --font-body: "Source Sans 3", system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Montserrat", system-ui, sans-serif;
+  --font-script: "Yellowtail", cursive;
+  --font-body: "Montserrat", system-ui, sans-serif;
 
   --label-weight: 700;
-  --value-weight: 400;
-  --label-size: 0.68rem;
+  --value-weight: 500;
+  --label-size: 0.72rem;
   --value-size: 0.9rem;
 
   --radius-sm: 6px;
@@ -19,6 +30,7 @@
   --radius-lg: 20px;
   --shadow-card: 0 12px 40px rgba(7, 41, 62, 0.12);
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --campaign-gradient: linear-gradient(168deg, var(--sb-blue-ink) 0%, var(--sb-blue-deep) 35%, var(--sb-blue) 75%, var(--sb-royal) 100%);
 }
 
 *,
@@ -35,7 +47,7 @@ html {
 
 body {
   font-family: var(--font-body);
-  font-weight: 400;
+  font-weight: 500;
   background: var(--sb-off-white);
   color: var(--sb-navy-deep);
   line-height: 1.55;
@@ -69,16 +81,16 @@ a:hover {
   border: 0;
 }
 
-/* Subtle professional background (replaces Magic Rings) */
+/* Subtle page background */
 .page-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 85% 15%, rgba(94, 198, 232, 0.07) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 10% 80%, rgba(35, 51, 100, 0.05) 0%, transparent 50%),
-    linear-gradient(180deg, var(--sb-off-white) 0%, #eef6fa 100%);
+    radial-gradient(ellipse 80% 50% at 85% 12%, rgba(30, 87, 214, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 8% 82%, rgba(225, 193, 101, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, var(--sb-off-white) 0%, #eef3fb 100%);
 }
 
 .site-header,
@@ -93,8 +105,7 @@ a:hover {
 
 /* Header */
 .site-header {
-  background: var(--sb-navy-deep);
-  border-bottom: 3px solid var(--sb-pink);
+  background: var(--sb-blue-ink);
 }
 
 .navbar {
@@ -114,26 +125,11 @@ a:hover {
   text-decoration: none;
 }
 
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--sb-pink);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 0.85rem;
-  border-radius: var(--radius-sm);
-}
-
-.brand-text {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #fff;
-  letter-spacing: 0.02em;
+.brand img {
+  height: 26px;
+  width: auto;
+  filter: invert(1) grayscale(1) brightness(1.9);
+  mix-blend-mode: screen;
 }
 
 .nav-links {
@@ -143,88 +139,108 @@ a:hover {
 }
 
 .nav-links a {
-  color: rgba(246, 252, 255, 0.85);
+  color: var(--text-dim);
   font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 500;
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: #fff;
+  color: var(--sb-white);
 }
 
 .nav-links a.active {
-  border-bottom: 2px solid var(--sb-sky);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 /* Hero */
 .hero {
-  background: var(--sb-navy-deep);
-  color: #fff;
-  padding: 3.5rem 1.5rem 5rem;
-  clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+  background: var(--campaign-gradient);
+  color: var(--sb-white);
+  padding: 3.5rem 1.5rem 7.5rem;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+  margin-bottom: -2rem;
+  text-align: center;
 }
 
 .hero-inner {
-  max-width: 1280px;
+  max-width: 900px;
   margin: 0 auto;
+  position: relative;
 }
 
 .hero-eyebrow {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 300;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.95;
+  letter-spacing: 0.45em;
+  color: var(--sb-gold-light);
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 12vw, 7rem);
+  font-size: clamp(3rem, 8.5vw, 5.25rem);
   font-weight: 800;
   font-style: italic;
   text-transform: uppercase;
-  line-height: 0.95;
+  line-height: 0.92;
   letter-spacing: -0.02em;
-  margin-top: 0.15rem;
+  color: var(--sb-white);
+  margin-top: 1.5rem;
+}
+
+.hero-title .hero-line {
+  display: block;
+}
+
+.hero-title .hero-line--gold {
+  color: var(--sb-gold-light);
+}
+
+.hero-script {
+  display: inline-block;
+  font-family: var(--font-script);
+  font-size: clamp(1.6rem, 4.5vw, 2.5rem);
+  font-weight: 400;
+  color: var(--sb-white);
+  margin-top: 1.25rem;
+  padding: 0 0.75rem;
+  transform: rotate(-2deg);
 }
 
 .hero-lead {
-  margin-top: 1.75rem;
-  max-width: 42rem;
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: rgba(246, 252, 255, 0.88);
-  line-height: 1.65;
+  margin: 2rem auto 0;
+  max-width: 34rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  line-height: 1.7;
 }
 
 /* Intro */
 .intro {
   background: #fff;
-  padding: 3rem 1.5rem 4.5rem;
-  margin-top: -2rem;
-  clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 92%);
+  padding: 3.5rem 1.5rem 3rem;
+  text-align: center;
 }
 
 .intro-inner {
   max-width: 720px;
   margin: 0 auto;
-  text-align: center;
-  padding-top: 1rem;
 }
 
 .section-eyebrow {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 300;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--sb-navy);
+  letter-spacing: 0.3em;
+  color: var(--sb-gold-deep);
 }
 
 .section-title {
@@ -233,15 +249,15 @@ a:hover {
   font-weight: 800;
   font-style: italic;
   text-transform: uppercase;
-  color: var(--sb-navy-deep);
-  margin-top: 0.25rem;
+  color: var(--sb-blue-ink);
+  margin-top: 0.35rem;
 }
 
 .section-copy {
   margin-top: 1rem;
   color: var(--sb-navy);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 /* Portal */
@@ -267,14 +283,14 @@ a:hover {
 
 .filters-title {
   font-family: var(--font-display);
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--sb-navy);
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--sb-sky);
+  border-bottom: 2px solid var(--sb-gold);
 }
 
 .filter-group {
@@ -283,7 +299,7 @@ a:hover {
 
 .filter-label {
   display: block;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
   text-transform: uppercase;
@@ -320,7 +336,7 @@ a:hover {
   border-radius: var(--radius-sm);
   padding: 0.65rem 2rem 0.65rem 0.75rem;
   font-family: inherit;
-  font-size: var(--value-size);
+  font-size: 0.88rem;
   font-weight: var(--value-weight);
   color: var(--sb-navy-deep);
   background: var(--sb-off-white);
@@ -333,7 +349,7 @@ a:hover {
 }
 
 .select-wrap::after {
-  content: "▾";
+  content: "\25BE";
   position: absolute;
   right: 0.75rem;
   top: 50%;
@@ -368,7 +384,7 @@ a:hover {
   border: 1px solid rgba(35, 51, 100, 0.3);
   background: var(--sb-off-white);
   color: var(--sb-navy-deep);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.78rem;
   font-weight: 600;
   padding: 0.45rem 0.75rem;
@@ -384,8 +400,8 @@ a:hover {
 
 .toggle-btn.active,
 .pill.active {
-  background: var(--sb-navy);
-  border-color: var(--sb-navy);
+  background: var(--sb-blue-deep);
+  border-color: var(--sb-blue-deep);
   color: #fff;
 }
 
@@ -395,7 +411,7 @@ a:hover {
   padding: 0.55rem;
   border: 1px dashed rgba(35, 51, 100, 0.35);
   background: transparent;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--sb-navy);
@@ -429,7 +445,7 @@ a:hover {
 }
 
 .sort-label {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
   text-transform: uppercase;
@@ -439,18 +455,18 @@ a:hover {
 
 .athletes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
-/* Athlete cards — visual-first */
+/* Athlete cards */
 .athlete-card {
   display: flex;
   flex-direction: column;
-  background: var(--sb-navy-deep);
+  background: linear-gradient(165deg, var(--sb-blue-deep) 0%, var(--sb-blue) 70%, #1a4bbd 100%);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 12px 40px rgba(5, 15, 45, 0.18);
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition);
   border: none;
@@ -462,14 +478,14 @@ a:hover {
 
 .athlete-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 18px 48px rgba(7, 41, 62, 0.22);
+  box-shadow: 0 18px 48px rgba(5, 15, 45, 0.32);
 }
 
 .card-media {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--sb-navy);
+  background: linear-gradient(135deg, var(--sb-blue) 0%, var(--sb-blue-deep) 100%);
 }
 
 .card-media img {
@@ -492,7 +508,7 @@ a:hover {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(7, 41, 62, 0.55) 100%);
+  background: linear-gradient(180deg, transparent 40%, rgba(5, 15, 45, 0.6) 100%);
   pointer-events: none;
 }
 
@@ -530,7 +546,7 @@ a:hover {
   bottom: 1.15rem;
   left: 1rem;
   font-family: var(--font-display);
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -542,9 +558,9 @@ a:hover {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  background: var(--sb-pink);
-  color: #fff;
-  font-family: var(--font-display);
+  background: var(--sb-gold);
+  color: var(--sb-blue-ink);
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -561,26 +577,34 @@ a:hover {
 
 .card-name {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 800;
   font-style: italic;
   text-transform: uppercase;
   color: #fff;
   letter-spacing: 0.02em;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .card-meta-line {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 0.75rem;
-  margin-top: 0.35rem;
+  margin-top: 0.5rem;
 }
 
-.card-position,
+.card-position {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sb-gold-light);
+  text-transform: uppercase;
+}
+
 .card-class {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--sb-sky);
+  color: rgba(246, 252, 255, 0.72);
   text-transform: uppercase;
 }
 
@@ -590,7 +614,7 @@ a:hover {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.65rem 1rem;
-  background: linear-gradient(90deg, #c9a227 0%, #e8d48b 35%, #c9a227 70%, #a8861e 100%);
+  background: var(--sb-gold);
 }
 
 .card-meta-pills {
@@ -600,22 +624,22 @@ a:hover {
 }
 
 .card-meta-pills span {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--sb-navy-deep);
+  color: var(--sb-blue-ink);
   background: rgba(255, 255, 255, 0.85);
   padding: 0.2rem 0.45rem;
   border-radius: 3px;
 }
 
 .btn-card-view {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--sb-navy-deep);
+  color: var(--sb-blue-ink);
   white-space: nowrap;
 }
 
@@ -630,7 +654,7 @@ a:hover {
 
 .empty-state h3 {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   color: var(--sb-navy-deep);
   margin-bottom: 0.5rem;
 }
@@ -659,18 +683,19 @@ a:hover {
 
 .trust-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.75rem;
   font-weight: 800;
+  font-style: italic;
   text-transform: uppercase;
-  color: var(--sb-navy-deep);
-  letter-spacing: 0.04em;
+  color: var(--sb-blue-ink);
+  letter-spacing: 0.02em;
 }
 
 .trust-subtitle {
   margin-top: 0.5rem;
   font-size: 0.95rem;
   color: var(--sb-navy);
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .logo-grid {
@@ -689,10 +714,11 @@ a:hover {
   border: 1px solid rgba(35, 51, 100, 0.12);
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 700;
+  text-transform: uppercase;
   color: var(--sb-navy);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .testimonial-grid {
@@ -708,12 +734,12 @@ a:hover {
   border: 1px solid rgba(35, 51, 100, 0.1);
   border-radius: var(--radius-md);
   padding: 1.25rem;
-  border-left: 4px solid var(--sb-sky);
+  border-left: 4px solid var(--sb-gold);
 }
 
 .testimonial p {
   font-size: 0.95rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--sb-navy-deep);
   line-height: 1.6;
 }
@@ -721,7 +747,7 @@ a:hover {
 .testimonial footer {
   margin-top: 0.75rem;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--sb-navy);
 }
 
@@ -751,7 +777,9 @@ a:hover {
 
 .story-athlete {
   font-family: var(--font-display);
+  font-size: 1.05rem;
   font-weight: 700;
+  text-transform: uppercase;
   color: var(--sb-navy-deep);
 }
 
@@ -761,11 +789,169 @@ a:hover {
 }
 
 .story-outcome {
-  font-weight: 400;
+  font-weight: 500;
   color: var(--sb-navy);
 }
 
-/* Modals — centered */
+/* Footer (marketing design) */
+.site-footer {
+  background: #151d31;
+  color: #fff;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+}
+
+.footer-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem 3.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.footer-logo {
+  height: 28px;
+  width: auto;
+  filter: invert(1) grayscale(1) brightness(1.9);
+  mix-blend-mode: screen;
+}
+
+.footer-tagline {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.footer-tagline strong {
+  color: var(--sb-gold-light);
+}
+
+.footer-heading {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.footer-contact {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  line-height: 2;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.footer-contact a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.6rem;
+}
+
+.footer-social a {
+  color: #8e97ab;
+}
+
+.footer-social svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.6rem;
+  padding-top: 0.5rem;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #97a0b5;
+}
+
+.google-wordmark {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #97a0b5;
+}
+
+.pe-check {
+  width: 16px;
+  height: 16px;
+  color: #97a0b5;
+}
+
+.pe-wordmark {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: #97a0b5;
+}
+
+.pe-wordmark strong {
+  font-weight: 800;
+}
+
+.stars {
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  color: #97a0b5;
+}
+
+.rating-value {
+  font-size: 0.62rem;
+  color: #8e97ab;
+  white-space: nowrap;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.1rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: #8e97ab;
+  font-size: 0.75rem;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-links li + li::before {
+  content: "|";
+  margin: 0 0.85rem;
+  color: #4a5470;
+}
+
+.footer-links a {
+  color: #8e97ab;
+  text-decoration: none;
+}
+
+.footer-copy {
+  color: #8e97ab;
+}
+
+/* Modals */
 .modal {
   border: none;
   padding: 0;
@@ -785,7 +971,7 @@ a:hover {
 }
 
 .modal::backdrop {
-  background: rgba(7, 41, 62, 0.75);
+  background: rgba(5, 15, 45, 0.78);
   backdrop-filter: blur(6px);
 }
 
@@ -795,7 +981,7 @@ a:hover {
   overflow-y: auto;
   background: #fff;
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 80px rgba(7, 41, 62, 0.35);
+  box-shadow: 0 24px 80px rgba(5, 15, 45, 0.4);
   position: relative;
 }
 
@@ -847,7 +1033,7 @@ a:hover {
 
 /* Profile */
 .profile-hero {
-  background: var(--sb-navy-deep);
+  background: linear-gradient(165deg, var(--sb-blue-deep) 0%, var(--sb-blue) 100%);
   color: #fff;
   padding: 2rem 1.75rem 1.5rem;
   display: grid;
@@ -861,16 +1047,27 @@ a:hover {
   height: 160px;
   border-radius: var(--radius-sm);
   object-fit: cover;
-  border: 3px solid var(--sb-sky);
+  border: 3px solid var(--sb-gold);
+}
+
+.profile-hero-photo.placeholder {
+  background: var(--sb-blue-ink);
 }
 
 .profile-hero-main {
   min-width: 0;
 }
 
+.profile-name-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.65rem 1rem;
+}
+
 .profile-name-row h2 {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 800;
   font-style: italic;
   text-transform: uppercase;
@@ -878,8 +1075,8 @@ a:hover {
 
 .profile-hero-meta {
   font-size: 0.85rem;
-  font-weight: 400;
-  color: var(--sb-sky);
+  font-weight: 500;
+  color: var(--sb-gold-light);
   margin-top: 0.35rem;
 }
 
@@ -895,7 +1092,7 @@ a:hover {
   border-radius: var(--radius-sm);
   overflow: hidden;
   cursor: pointer;
-  background: var(--sb-navy);
+  background: var(--sb-blue-ink);
   flex-shrink: 0;
 }
 
@@ -921,11 +1118,11 @@ a:hover {
 .profile-reel-label {
   display: block;
   font-family: var(--font-display);
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--sb-sky);
+  color: var(--sb-gold-light);
   margin-bottom: 0.35rem;
   text-align: center;
 }
@@ -936,7 +1133,7 @@ a:hover {
 }
 
 .profile-gallery h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
   text-transform: uppercase;
@@ -963,7 +1160,7 @@ a:hover {
   border: none;
   background: var(--sb-pink);
   color: #fff;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -994,7 +1191,7 @@ a:hover {
   border: none;
   background: none;
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1032,9 +1229,9 @@ a:hover {
 }
 
 .detail-row dt {
-  font-family: var(--font-display);
-  font-size: var(--label-size);
-  font-weight: var(--label-weight);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--sb-navy);
@@ -1043,7 +1240,7 @@ a:hover {
 
 .detail-row dd {
   font-size: var(--value-size);
-  font-weight: var(--value-weight);
+  font-weight: 600;
   color: var(--sb-navy-deep);
 }
 
@@ -1070,7 +1267,7 @@ a:hover {
 
 .data-point-value {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--sb-navy-deep);
   line-height: 1.2;
@@ -1078,7 +1275,7 @@ a:hover {
 
 .data-point-unit {
   font-size: 0.72rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--sb-navy);
   margin-top: 0.1rem;
 }
@@ -1104,16 +1301,38 @@ a:hover {
   margin-bottom: 0.25rem;
 }
 
+.detail-narrative {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: var(--sb-off-white);
+  border-left: 4px solid var(--sb-gold);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.detail-narrative h4 {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sb-pink);
+  margin-bottom: 0.4rem;
+}
+
+.detail-narrative p {
+  font-size: 0.88rem;
+  color: var(--sb-navy-deep);
+}
+
 .performance-chart {
   margin-top: 1.25rem;
   padding: 1rem;
   background: var(--sb-off-white);
-  border-left: 4px solid var(--sb-sky);
+  border-left: 4px solid var(--sb-gold);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .performance-chart h4 {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
   text-transform: uppercase;
@@ -1136,7 +1355,7 @@ a:hover {
 }
 
 .season-table th {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1145,17 +1364,17 @@ a:hover {
 }
 
 .season-table td {
-  font-weight: 400;
+  font-weight: 500;
   color: var(--sb-navy-deep);
 }
 
 .season-table .metric-value {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .modal-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.6rem;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--sb-navy-deep);
@@ -1164,13 +1383,13 @@ a:hover {
 
 .modal-subtitle {
   font-size: 0.85rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--sb-navy);
   margin: 0.5rem 0 1rem;
 }
 
 .recruit-athlete-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--sb-pink);
   margin-bottom: 1rem;
 }
@@ -1181,7 +1400,7 @@ a:hover {
 
 .recruit-form label {
   display: block;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
   text-transform: uppercase;
@@ -1195,7 +1414,7 @@ a:hover {
 }
 
 .optional {
-  font-weight: 400;
+  font-weight: 500;
   text-transform: none;
   letter-spacing: 0;
   color: var(--sb-navy);
@@ -1229,23 +1448,39 @@ a:hover {
   margin-top: 0.5rem;
 }
 
-.site-footer {
-  background: var(--sb-navy-deep);
-  color: rgba(246, 252, 255, 0.9);
-  text-align: center;
-  padding: 2rem 1.5rem;
-  font-size: 0.9rem;
+/* Scroll-to-top */
+.scroll-top {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+  background: #16295b;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(3, 10, 34, 0.45);
+  z-index: 10;
 }
 
-.site-footer a {
-  color: var(--sb-sky);
+.scroll-top:hover {
+  background: var(--sb-blue);
 }
 
-.footer-note {
-  margin-top: 0.5rem;
-  font-size: 0.82rem;
-  font-weight: 400;
-  opacity: 0.85;
+.scroll-top svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .athletes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
@@ -1274,6 +1509,10 @@ a:hover {
     margin: 0 auto;
   }
 
+  .profile-name-row {
+    justify-content: center;
+  }
+
   .profile-gallery {
     padding: 0 1.25rem;
   }
@@ -1286,5 +1525,13 @@ a:hover {
 
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-main {
+    padding: 3rem 1.5rem 2.5rem;
+  }
+
+  .footer-bottom {
+    padding: 1.1rem 1.5rem;
   }
 }
