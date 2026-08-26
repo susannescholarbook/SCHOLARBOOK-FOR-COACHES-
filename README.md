@@ -25,6 +25,27 @@ npx serve .
 3. Nach wenigen Minuten erreichbar unter:
    `https://susannescholarbook.github.io/SCHOLARBOOK-FOR-COACHES-/`
 
+## An mehreren Stellen arbeiten (synchron bleiben)
+
+Dieses Projekt kann von mehreren Orten aus bearbeitet werden (z. B. Desktop-App
+und Claude im Browser). Damit du nie auf einem veralteten Stand arbeitest:
+
+**Vor dem Arbeiten** — neuesten Stand von GitHub holen:
+
+```bash
+git pull
+```
+
+**Nach dem Arbeiten** — Änderungen speichern und hochladen:
+
+```bash
+git add -A
+git commit -m "Kurze Beschreibung der Änderung"
+git push
+```
+
+Merksatz: **erst `pull`, dann arbeiten, am Ende `push`.**
+
 ## Inhalte bearbeiten
 
 Die Athletendaten und die gesamte Anzeige-Logik stecken in **`app.js`**
