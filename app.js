@@ -1,5 +1,10 @@
 /**
  * Scholarbook For Coaches — athlete directory
+ *
+ * The data model mirrors the WordPress profiles on
+ * https://official.scholarbook.net/de/for-coaches/ (tabs Athletics, Multimedia,
+ * Personal, Academics; athletic fields differ per sport). See FELDER.md for the
+ * full WordPress → app.js field mapping.
  */
 
 const SPORTS = [
@@ -9,468 +14,843 @@ const SPORTS = [
   "Track and Field, Cross Country", "Volleyball", "Waterpolo", "Wrestling", "Other sports",
 ];
 
-const MEASURABLE_SPORTS = new Set([
-  "Track and Field, Cross Country",
-  "Swimming",
-  "Rowing",
-  "Cross country skiing",
-]);
+/* ---------- Field schema (labels exactly as on the WordPress profiles) ---------- */
 
-/** Sport-specific athletic field keys (Personal & Academic stays universal) */
-const SPORT_ATHLETIC_KEYS = {
-  Soccer: ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "current_league", "highest_league", "training_hours", "team_role", "personal_strengths"],
-  Basketball: ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "current_league", "highest_league", "training_hours", "team_role", "personal_strengths"],
-  "Track and Field, Cross Country": ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "highest_league", "training_hours", "personal_strengths"],
-  Swimming: ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "highest_league", "training_hours", "personal_strengths"],
-  Rowing: ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "highest_league", "training_hours", "team_role", "personal_strengths"],
-  Tennis: ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "current_league", "highest_league", "training_hours", "team_role", "personal_strengths"],
-  "Field hockey": ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "current_league", "highest_league", "training_hours", "team_role", "personal_strengths"],
+/** f(label, key, type): type "text" (default), "long" (rich text, full width), "link" */
+const f = (label, key, type = "text") => ({ label, key, type });
+
+const COMMON = {
+  height: f("Height", "height"),
+  weight: f("Weight", "weight"),
+  club: f("Club", "club"),
+  current_league: f("Current league", "current_league"),
+  highest_league: f("Highest league played", "highest_league"),
+  main_position: f("Main position", "main_position"),
+  secondary_position: f("Secondary position", "secondary_position"),
+  disciplines: f("Disciplines", "disciplines"),
+  further_disciplines: f("Further disciplines", "further_disciplines"),
+  training_units: f("Training units per week", "training_units_per_week"),
+  training_hours: f("Training hours per week", "training_hours_per_week"),
+  exercised_since: f("Exercised since", "exercised_since"),
+  role: f("Role in the team", "role_in_team", "long"),
+  strengths: f("Strengths", "strengths", "long"),
+  misc: f("Miscellaneous information", "misc_info", "long"),
+  personal_bests: f("Personal bests", "personal_bests", "long"),
 };
 
-const ATHLETIC_LABELS = {
-  position: "Position",
-  height: "Height",
-  weight: "Weight",
-  personal_bests: "Personal Bests",
-  season_stats: "Season Stats",
-  achievements: "Greatest Successes",
-  club: "Club Name",
-  current_league: "Current League",
-  highest_league: "Highest League Played",
-  training_hours: "Training Hours per Week",
-  team_role: "Role in the Team",
-  personal_strengths: "Personal Strengths",
+const SUCCESSES = {
+  title: "Greatest Successes",
+  fields: [
+    f("Local Successes", "local", "long"),
+    f("National Successes", "national", "long"),
+    f("International Successes", "international", "long"),
+    f("Miscellaneous Successes", "miscellaneous", "long"),
+  ],
 };
 
-const PERSONAL_FIELDS = [
-  ["First Name", "firstname"],
-  ["Surname Initial", "lastname_initial"],
-  ["Age", "age"],
-  ["Status", "enrollment_status"],
-  ["Eligibility", "eligibility"],
-  ["Expected Start of Studies", "start_term"],
-  ["Class", "class_of"],
-  ["Expected GPA", "gpa"],
-  ["Potential Major", "potential_major"],
+const ACHIEVEMENTS = {
+  title: "Greatest Achievements",
+  fields: [
+    f("Local Achievements", "local", "long"),
+    f("National Achievements", "national", "long"),
+    f("International Achievements", "international", "long"),
+    f("Miscellaneous Achievements", "miscellaneous", "long"),
+  ],
+};
+
+const SEASON_BASE = [
+  f("League", "league"),
+  f("Club", "club"),
+  f("Position", "position"),
+  f("Secondary Position", "secondary_position"),
 ];
 
-function hasTestScore(value) {
-  if (value === undefined || value === null) return false;
-  const s = String(value).trim();
-  return s.length > 0 && s !== "—" && s !== "-";
+const GOLF_RESULT_COLUMNS = [
+  ["Year", "year"], ["Placement", "placement"], ["Tournament", "tournament"],
+  ["CR", "cr"], ["SLOPE", "slope"], ["PAR", "par"],
+  ["R1", "r1"], ["R2", "r2"], ["R3", "r3"], ["R4", "r4"],
+];
+
+const DEFAULT_SCHEMA = {
+  info: [
+    COMMON.club, COMMON.training_units, COMMON.training_hours, COMMON.height, COMMON.weight,
+    COMMON.disciplines, COMMON.further_disciplines, COMMON.role, COMMON.strengths, COMMON.misc,
+  ],
+  successes: SUCCESSES,
+};
+
+/** Athletic fields per sport, in the order WordPress renders them */
+const SPORT_SCHEMAS = {
+  Soccer: {
+    info: [
+      COMMON.main_position, COMMON.secondary_position, COMMON.height, COMMON.weight,
+      f("Foot", "foot"), f("Sprint-times", "sprint_times", "long"), COMMON.club,
+      COMMON.current_league, COMMON.highest_league, f("Link of current club", "club_link", "link"),
+      COMMON.role, COMMON.strengths, COMMON.misc,
+    ],
+    seasons: {
+      title: "Season stats field player",
+      fields: [
+        ...SEASON_BASE,
+        f("Games Played", "games_played"),
+        f("Games Started", "games_started"),
+        f("Goals", "goals"),
+        f("Assists", "assists"),
+        // Goalkeeper season fields
+        f("Of which won", "won"),
+        f("Of which drawn", "drawn"),
+        f("Of which lost", "lost"),
+        f("Number of goals conceded", "goals_conceded"),
+        f("Number of games to nil", "games_to_nil"),
+        f("Penalties saved", "penalties_saved"),
+        f("Link zum Verein", "club_link", "link"),
+      ],
+    },
+    successes: SUCCESSES,
+  },
+
+  "Track and Field, Cross Country": {
+    info: [
+      COMMON.height, COMMON.weight, COMMON.club, COMMON.disciplines, COMMON.further_disciplines,
+      f("Training Sessions per week", "training_units_per_week"), COMMON.training_hours,
+      COMMON.role, COMMON.strengths, COMMON.misc,
+      f("Athletic Progression", "athletic_progression", "long"), COMMON.personal_bests,
+    ],
+    successes: ACHIEVEMENTS,
+  },
+
+  Swimming: {
+    info: [
+      COMMON.height, COMMON.weight, COMMON.club, COMMON.disciplines, COMMON.further_disciplines,
+      COMMON.training_units, COMMON.training_hours, COMMON.role, COMMON.strengths, COMMON.misc,
+      COMMON.personal_bests, f("Performance Development", "performance_development", "long"),
+    ],
+    successes: SUCCESSES,
+  },
+
+  Golf: {
+    info: [
+      COMMON.club, COMMON.current_league,
+      f("Strength on the course", "strength_on_course", "long"),
+      f("Weaknesses on the course", "weaknesses_on_course", "long"),
+      f("Mentality on the course", "mentality_on_course", "long"),
+      f("Development Potential", "development_potential", "long"),
+      f("HCP", "hcp"),
+      f("Carry distance 7 iron", "carry_7_iron"),
+      f("Carry distance driver", "carry_driver"),
+      f("Driver swing Speed", "driver_swing_speed"),
+      f("Average greens hit", "average_greens_hit"),
+      COMMON.role, COMMON.misc,
+    ],
+    successes: SUCCESSES,
+    golfResults: true,
+  },
+
+  Basketball: {
+    info: [
+      COMMON.main_position, COMMON.secondary_position, COMMON.height, COMMON.weight, COMMON.club,
+      COMMON.current_league, COMMON.highest_league, COMMON.role, COMMON.strengths, COMMON.misc,
+    ],
+    seasons: {
+      title: "Season stats field player",
+      fields: [
+        ...SEASON_BASE,
+        f("G", "g"), f("MPG", "mpg"), f("PPG", "ppg"), f("FTP", "ftp"), f("3PP", "three_pp"),
+        f("RPG", "rpg"), f("APG", "apg"), f("STL", "stl"), f("TO", "to"),
+        f("Internetlink", "link", "link"),
+      ],
+    },
+    successes: SUCCESSES,
+  },
+
+  "Field hockey": {
+    info: [
+      COMMON.main_position, COMMON.secondary_position, f("Regular player", "regular_player"),
+      COMMON.height, COMMON.weight, COMMON.club, COMMON.role, COMMON.strengths, COMMON.misc,
+    ],
+    seasons: {
+      title: "Season stats field player",
+      fields: [
+        ...SEASON_BASE,
+        f("Games Played", "games_played"), f("Games Started", "games_started"),
+        f("Goals", "goals"), f("Assists", "assists"),
+        f("Link zum Verein", "club_link", "link"),
+      ],
+    },
+    successes: SUCCESSES,
+  },
+
+  Volleyball: {
+    info: [
+      COMMON.height, COMMON.weight, COMMON.exercised_since, COMMON.training_hours,
+      f("Position", "position"), f("Dominant hand", "dominant_hand"),
+      f("Standing reach", "standing_reach"), f("Block jump touch", "block_jump_touch"),
+      f("Hitting reach", "hitting_reach"), f("League", "league"), COMMON.highest_league, COMMON.club,
+    ],
+    successes: SUCCESSES,
+  },
+
+  Tennis: {
+    info: [
+      COMMON.height, COMMON.weight, COMMON.club, COMMON.current_league,
+      f("Strength on the course", "strength_on_course", "long"),
+      f("Weaknesses on the course", "weaknesses_on_course", "long"),
+      f("Mentality on the course", "mentality_on_course", "long"),
+      f("Development Potential", "development_potential", "long"),
+    ],
+    successes: SUCCESSES,
+    rankings: true,
+    bestMatches: true,
+  },
+
+  Rowing: {
+    info: [
+      COMMON.height, COMMON.weight, COMMON.exercised_since, COMMON.disciplines, COMMON.training_hours,
+      f("Personal best 2000m Ergo test", "erg_2000m"), COMMON.role, COMMON.strengths,
+      f("Still to improve", "still_to_improve", "long"), COMMON.misc,
+    ],
+    successes: SUCCESSES,
+  },
+
+  Baseball: {
+    info: [
+      COMMON.club, COMMON.training_units, COMMON.training_hours, COMMON.height, COMMON.weight,
+      f("Position", "position"), f("Secondary positions", "secondary_positions"),
+      f("Bat/Throw", "bat_throw"), COMMON.highest_league, COMMON.exercised_since,
+      COMMON.role, COMMON.misc,
+    ],
+    successes: SUCCESSES,
+  },
+
+  Cycling: DEFAULT_SCHEMA,
+
+  Wrestling: {
+    info: [
+      COMMON.club, COMMON.training_units, COMMON.training_hours, COMMON.height, COMMON.weight,
+      COMMON.role, COMMON.misc,
+    ],
+    successes: SUCCESSES,
+  },
+};
+
+function getSchema(sport) {
+  return SPORT_SCHEMAS[sport] || DEFAULT_SCHEMA;
 }
 
-/** Show test date only when no score exists; otherwise show score only */
-function personalTestFields(athlete) {
-  const fields = [];
-  if (hasTestScore(athlete.duolingo_score)) {
-    fields.push(["Duolingo Score", "duolingo_score"]);
-  } else if (athlete.duolingo_date) {
-    fields.push(["Duolingo Test Date", "duolingo_date"]);
-  }
-  if (hasTestScore(athlete.sat_act_score)) {
-    fields.push(["SAT/ACT Score", "sat_act_score"]);
-  } else if (athlete.sat_act_date) {
-    fields.push(["SAT/ACT Test Date", "sat_act_date"]);
-  }
-  return fields;
-}
+const PERSONAL_FIELDS = [
+  f("Sex", "sex"),
+  f("Date of Birth", "date_of_birth"),
+  f("Nationality", "nationality"),
+];
 
-function getPersonalFields(athlete) {
-  return [...PERSONAL_FIELDS, ...personalTestFields(athlete)];
-}
+/** Fields marked optional are hidden when empty (as on WordPress) */
+const ACADEMIC_FIELDS = [
+  f("Graduation", "graduation"),
+  f("GPA", "gpa"),
+  f("Enrollment", "enrollment"),
+  f("Potential Major", "potential_major"),
+  { ...f("Duolingo", "duolingo"), optional: true },
+  { ...f("TOEFL", "toefl"), optional: true },
+  { ...f("SAT: CR", "sat_cr"), optional: true },
+  { ...f("SAT: M", "sat_m"), optional: true },
+  { ...f("SAT Essay", "sat_essay"), optional: true },
+  { ...f("ACT", "act"), optional: true },
+];
+
+/* ---------- Demo data (fictional athletes, WordPress structure) ---------- */
 
 const athletes = [
   {
-    firstname: "Emma",
-    lastname_initial: "S.",
-    age: 18,
-    gender: "Female",
-    region: "Hesse, Germany",
-    enrollment_status: "Freshman",
-    eligibility: "NCAA Div 1, NCAA Div 2, NAIA",
-    start_term: "Fall 2026",
-    start_year: 2026,
-    class_of: 2026,
-    graduation_year: 2025,
-    gpa: "3.95 (Unweighted)",
-    gpa_numeric: 3.95,
-    potential_major: "Exercise Science",
-    duolingo_date: "Oct 2025",
-    duolingo_score: "135",
-    sat_act_date: "Nov 2025",
-    sat_act_score: "SAT 1420",
+    id: "demo-emma-s",
     sport: "Soccer",
-    position: "Central Midfielder",
-    height: "5'8\" (173 cm)",
-    weight: "145 lbs (66 kg)",
-    personal_bests: [
-      { value: "13.4", unit: "level", label: "Beep Test" },
-      { value: "4.88", unit: "sec", label: "40-Yard Dash" },
-    ],
-    season_stats: [
-      { value: "24", unit: "matches", label: "Matches" },
-      { value: "12", unit: "goals", label: "Goals" },
-      { value: "18", unit: "assists", label: "Assists" },
-    ],
-    achievements: ["German Youth National League Champion (U17)"],
-    club: "1. FFV Frankfurt Youth Academy",
-    current_league: "U19 Bundesliga",
-    highest_league: "U19 Bundesliga",
-    training_hours: "18 hrs/week",
-    team_role: "Team Captain & Primary Playmaker",
-    personal_strengths: ["Tactical awareness", "Two-footed passing", "Endurance"],
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+    name: "Emma S.",
+    photo: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&h=750&fit=crop",
+    profile_url: "",
     last_updated: "2026-06-15",
-    teaser: "Elite midfielder seeking NCAA Division I programs for Fall 2026.",
+    committed: null,
+    available_in: "Fall 2026",
+    eligibility: "D1, D2, NAIA",
+    academic_status: "Freshman",
+    list: { position: "CM", secondary_position: "AM", division: "U19 Bundesliga" },
+    personal: { sex: "Female", date_of_birth: "2008-03-14", nationality: "German" },
+    academics: {
+      graduation: "2026",
+      gpa: "Expected GPA 3.9",
+      enrollment: "Not yet enrolled",
+      potential_major: "Exercise Science",
+      duolingo: "135",
+      sat_cr: "710",
+      sat_m: "690",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+      info: {
+        main_position: "Central Midfielder",
+        secondary_position: "Offensive Midfielder",
+        height: "173 cm / 5.8 feet",
+        weight: "66.0 kg / 145 pounds",
+        foot: "Right foot",
+        sprint_times: "20m: 3.15 sec\n40m: 5.62 sec",
+        club: "1. FFC Frankfurt U20",
+        current_league: "U20 Bundesliga",
+        highest_league: "U20 Bundesliga",
+        club_link: "https://www.example.com/club",
+        role_in_team: "Captain and playmaker. I organise our build-up play and set the tempo in midfield.",
+        strengths: "Tactical awareness, two-footed passing and endurance over 90 minutes.",
+        misc_info: "Regular member of the state selection team since U15.",
+      },
+      seasons: [
+        { season: "2024/2025", league: "U17 Bundesliga", club: "1. FFC Frankfurt", position: "Central Midfielder", secondary_position: "Offensive Midfielder", games_played: "22", games_started: "20", goals: "9", assists: "14" },
+        { season: "2025/2026", league: "U20 Bundesliga", club: "1. FFC Frankfurt U20", position: "Central Midfielder", secondary_position: "Offensive Midfielder", games_played: "24", games_started: "24", goals: "12", assists: "18", club_link: "https://www.example.com/club" },
+      ],
+      successes: {
+        local: "Hessian Cup Winner 2025",
+        national: "German U17 Champion 2024",
+        international: "UEFA Youth Tournament participation 2025",
+      },
+    },
+    multimedia: {
+      videos: [{ title: "Full game vs. Turbine Potsdam U20", url: "https://www.youtube.com/watch?v=ysz5S6PUM-U" }],
+      photos: [
+        "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=300&fit=crop",
+      ],
+    },
   },
   {
-    firstname: "Niklas",
-    lastname_initial: "H.",
-    age: 19,
-    gender: "Male",
-    region: "Berlin, Germany",
-    enrollment_status: "Freshman",
-    eligibility: "NCAA Div 1, NCAA Div 2, NAIA, JUCO",
-    start_term: "Fall 2026",
-    start_year: 2026,
-    class_of: 2026,
-    graduation_year: 2025,
-    gpa: "3.10",
-    gpa_numeric: 3.1,
-    potential_major: "Communications",
-    duolingo_date: "Sep 2025",
-    duolingo_score: "110",
-    sat_act_date: "Oct 2025",
-    sat_act_score: "ACT 22",
-    sport: "Basketball",
-    position: "Combo Guard",
-    height: "6'3\" (190 cm)",
-    weight: "182 lbs (82 kg)",
-    personal_bests: [
-      { value: "34", unit: "in", label: "Vertical" },
-      { value: "10.8", unit: "sec", label: "Lane Agility" },
-    ],
-    season_stats: [
-      { value: "16.4", unit: "PPG", label: "Points" },
-      { value: "6.2", unit: "APG", label: "Assists" },
-      { value: "41", unit: "%", label: "3PT" },
-    ],
-    achievements: ["NBBL All-Star", "State Championship MVP"],
-    club: "ALBA Berlin Academy",
-    current_league: "NBBL & Regionalliga",
-    highest_league: "NBBL U19",
-    training_hours: "20 hrs/week",
-    team_role: "On-court general, vocal leader",
-    personal_strengths: ["High IQ", "Pick-and-roll decisions", "Defensive footwork"],
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1519861537509-b785668017ad?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    last_updated: "2026-06-28",
-    teaser: "Dynamic guard from Germany's top youth league pipeline.",
-  },
-  {
-    firstname: "Sarah",
-    lastname_initial: "L.",
-    age: 20,
-    gender: "Female",
-    region: "North Rhine-Westphalia, Germany",
-    enrollment_status: "Transfer",
-    eligibility: "NCAA Div 1",
-    start_term: "Fall 2027",
-    start_year: 2027,
-    class_of: 2024,
-    graduation_year: 2024,
-    gpa: "3.72",
-    gpa_numeric: 3.72,
-    potential_major: "Psychology",
-    duolingo_date: "Jun 2024",
-    duolingo_score: "140",
-    sat_act_date: "Oct 2023",
-    sat_act_score: "ACT 29",
-    sport: "Track and Field, Cross Country",
-    position: "800m / 1500m",
-    height: "5'6\" (168 cm)",
-    weight: "128 lbs (58 kg)",
-    personal_bests: [
-      { value: "2:05.42", unit: "min", label: "800m" },
-      { value: "4:18.15", unit: "min", label: "1500m" },
-    ],
-    season_stats: [
-      { value: "6", unit: "wins", label: "Invitational Wins" },
-      { value: "1", unit: "", label: "National Collegiate Finalist" },
-    ],
-    achievements: ["European U20 800m semifinalist"],
-    club: "LG Olympia Dortmund",
-    highest_league: "European U20 Championships",
-    training_hours: "20 hrs/week",
-    personal_strengths: ["Tactical racing", "Explosive kick", "Aerobic base"],
-    performance_seasons: [
-      { season: "2023–24", metric: "800m PR", value: "2:08.60" },
-      { season: "2024–25", metric: "800m PR", value: "2:05.42" },
-      { season: "2024–25", metric: "1500m PR", value: "4:18.15" },
-    ],
-    image: "https://images.unsplash.com/photo-1552675811-a8d68084c895?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1461896836934-ffe607c9380e?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1571008887538-b36bbaf4fe83?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1452626038306-9bf093d8b957?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-    last_updated: "2026-06-20",
-    teaser: "Transfer-ready middle-distance talent with international experience.",
-  },
-  {
-    firstname: "Lukas",
-    lastname_initial: "M.",
-    age: 19,
-    gender: "Male",
-    region: "North Rhine-Westphalia, Germany",
-    enrollment_status: "Freshman",
-    eligibility: "NCAA Div 1, NCAA Div 2",
-    start_term: "Fall 2026",
-    start_year: 2026,
-    class_of: 2026,
-    graduation_year: 2025,
-    gpa: "3.80",
-    gpa_numeric: 3.8,
-    potential_major: "Business Administration",
-    duolingo_date: "Sep 2025",
-    duolingo_score: "125",
-    sat_act_date: "Dec 2025",
-    sat_act_score: "SAT 1340",
-    sport: "Tennis",
-    position: "Singles / Doubles",
-    height: "6'2\" (188 cm)",
-    weight: "175 lbs (79 kg)",
-    personal_bests: [
-      { value: "12.4", unit: "UTR", label: "Universal Tennis Rating" },
-      { value: "122", unit: "mph", label: "Serve Speed" },
-    ],
-    season_stats: [
-      { value: "32-6", unit: "", label: "Singles Record" },
-      { value: "18-4", unit: "", label: "Doubles Record" },
-    ],
-    achievements: ["National U18 Singles Runner-Up (Germany)"],
-    club: "TC Rot-Weiß Düsseldorf",
-    current_league: "Regionalliga West",
-    highest_league: "Regionalliga West",
-    training_hours: "22 hrs/week",
-    team_role: "Lead singles competitor",
-    personal_strengths: ["Serve-forehand combo", "Lateral movement", "Mental resilience"],
-    image: "https://images.unsplash.com/photo-1622279457126-a79205ffae38?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1554068865-24cecd4e1b11?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-    last_updated: "2026-05-30",
-    teaser: "High-UTR prospect with ITF junior experience.",
-  },
-  {
-    firstname: "Chantal",
-    lastname_initial: "V.",
-    age: 17,
-    gender: "Female",
-    region: "North Brabant, Netherlands",
-    enrollment_status: "Freshman",
-    eligibility: "NAIA, NCAA Div 2",
-    start_term: "Fall 2028",
-    start_year: 2028,
-    class_of: 2028,
-    graduation_year: 2027,
-    gpa: "3.45 (estimated)",
-    gpa_numeric: 3.45,
-    potential_major: "Biological Sciences",
-    duolingo_date: "Planned Sep 2026",
-    duolingo_score: "—",
-    sat_act_date: "Planned Oct 2026",
-    sat_act_score: "—",
-    sport: "Swimming",
-    position: "Freestyle / Butterfly",
-    height: "5'10\" (178 cm)",
-    weight: "148 lbs (67 kg)",
-    personal_bests: [
-      { value: "56.40", unit: "sec", label: "100m Free (LCM)" },
-      { value: "1:02.15", unit: "sec", label: "100m Fly (LCM)" },
-    ],
-    season_stats: [
-      { value: "8", unit: "medals", label: "U18 National Meets" },
-    ],
-    achievements: ["Dutch Junior Nationals finalist"],
-    club: "PSV Eindhoven Swim Club",
-    highest_league: "Dutch National Championships",
-    training_hours: "24 hrs/week",
-    personal_strengths: ["Start reaction", "Dolphin kick", "Hydrodynamics"],
-    performance_seasons: [
-      { season: "2023–24", metric: "100m Free", value: "57.30s" },
-      { season: "2024–25", metric: "100m Free", value: "56.40s" },
-      { season: "2024–25", metric: "100m Fly", value: "1:02.15" },
-    ],
-    image: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1519315901247-f9ef1c2df5a0?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
-    last_updated: "2026-06-10",
-    teaser: "Rising sprint specialist targeting 2028 enrollment.",
-  },
-  {
-    firstname: "Finn",
-    lastname_initial: "W.",
-    age: 22,
-    gender: "Male",
-    region: "North Rhine-Westphalia, Germany",
-    enrollment_status: "Graduate",
-    eligibility: "NCAA Div 1",
-    start_term: "Fall 2026",
-    start_year: 2026,
-    class_of: 2022,
-    graduation_year: 2022,
-    gpa: "3.88",
-    gpa_numeric: 3.88,
-    potential_major: "Aerospace Engineering (M.S.)",
-    duolingo_date: "Jan 2026",
-    duolingo_score: "145",
-    sat_act_date: "Feb 2026",
-    sat_act_score: "GRE 322",
-    sport: "Rowing",
-    position: "Port Rower (8+)",
-    height: "6'6\" (198 cm)",
-    weight: "205 lbs (93 kg)",
-    personal_bests: [
-      { value: "5:58.2", unit: "min", label: "2k Erg" },
-    ],
-    season_stats: [
-      { value: "Undefeated", unit: "", label: "Senior Head Regattas" },
-    ],
-    achievements: ["Henley Temple Cup semifinalist"],
-    club: "Crefelder Ruder-Club 1883",
-    highest_league: "U23 International Championships",
-    training_hours: "26 hrs/week",
-    team_role: "Boat leader, cadence setter",
-    personal_strengths: ["Leverage", "VO2 max", "Catch mechanics"],
-    performance_seasons: [
-      { season: "2023–24", metric: "2k Erg", value: "6:04.8" },
-      { season: "2024–25", metric: "2k Erg", value: "5:59.1" },
-      { season: "2025–26", metric: "2k Erg", value: "5:58.2" },
-    ],
-    image: "https://images.unsplash.com/photo-1517649763962-0c62306601b7?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1544551763-77efdedddd72?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-    last_updated: "2026-06-25",
-    teaser: "Graduate transfer with Henley-level experience.",
-  },
-  {
-    firstname: "Matteo",
-    lastname_initial: "K.",
-    age: 18,
-    gender: "Male",
-    region: "Baden-Württemberg, Germany",
-    enrollment_status: "Freshman",
-    eligibility: "NCAA Div 2, NAIA, JUCO",
-    start_term: "Fall 2026",
-    start_year: 2026,
-    class_of: 2026,
-    graduation_year: 2025,
-    gpa: "3.25",
-    gpa_numeric: 3.25,
-    potential_major: "Sports Management",
-    duolingo_date: "Nov 2025",
-    duolingo_score: "115",
-    sat_act_date: "Jan 2026",
-    sat_act_score: "SAT 1180",
+    id: "demo-matteo-k",
     sport: "Soccer",
-    position: "Center Back",
-    height: "6'4\" (193 cm)",
-    weight: "190 lbs (86 kg)",
-    personal_bests: [
-      { value: "31", unit: "in", label: "Vertical" },
-      { value: "82", unit: "%", label: "Aerial Duel Success" },
-    ],
-    season_stats: [
-      { value: "26", unit: "starts", label: "Starts" },
-      { value: "164", unit: "", label: "Interceptions" },
-    ],
-    achievements: ["State selection team", "Defensive POTY 2025"],
-    club: "VfB Stuttgart U19",
-    current_league: "A-Junioren Regionalliga",
-    highest_league: "A-Junioren Regionalliga",
-    training_hours: "16 hrs/week",
-    team_role: "Defensive commander",
-    personal_strengths: ["Aerial dominance", "1v1 tackling", "Organization"],
-    image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1508098682722-e89c9a5890d5?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+    name: "Matteo K.",
+    photo: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&h=750&fit=crop",
+    profile_url: "",
     last_updated: "2026-06-18",
-    teaser: "Physical center back from Stuttgart youth academy.",
+    committed: null,
+    available_in: "Spring 2027",
+    eligibility: "D2, D3, NAIA, JUCO",
+    academic_status: "Freshman",
+    list: { position: "GK", secondary_position: "", division: "3rd U19" },
+    personal: { sex: "Male", date_of_birth: "2007-11-02", nationality: "German" },
+    academics: {
+      graduation: "2026",
+      gpa: "Expected: 3.0-3.3",
+      enrollment: "Not yet enrolled",
+      potential_major: "Sports Management",
+      duolingo: "November 2026",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+      info: {
+        main_position: "Goalkeeper",
+        height: "193 cm / 6.4 feet",
+        weight: "86.0 kg / 190 pounds",
+        foot: "Right foot",
+        club: "VfB Stuttgart U19",
+        current_league: "A-Junioren Regionalliga",
+        highest_league: "A-Junioren Regionalliga",
+        role_in_team: "Vocal organiser of the back line and one of the leaders in the dressing room.",
+        strengths: "Reflexes, 1v1 situations and long distribution.",
+      },
+      seasons: [
+        { season: "2024/2025", league: "B-Junioren Oberliga", club: "VfB Stuttgart U17", position: "Goalkeeper", games_played: "20", won: "12", drawn: "4", lost: "4", goals_conceded: "18", games_to_nil: "8", penalties_saved: "3" },
+        { season: "2025/2026", league: "A-Junioren Regionalliga", club: "VfB Stuttgart U19", position: "Goalkeeper", games_played: "24", won: "13", drawn: "3", lost: "8", goals_conceded: "24", games_to_nil: "5", penalties_saved: "2" },
+      ],
+      successes: {
+        local: "Württemberg Cup Winner 2025",
+        miscellaneous: "Selected for the regional goalkeeper camp 2025",
+      },
+    },
+    multimedia: {
+      videos: [{ title: "GK session", url: "https://www.youtube.com/watch?v=ysz5S6PUM-U" }],
+      photos: [
+        "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1508098682722-e89c9a5890d5?w=400&h=300&fit=crop",
+      ],
+    },
   },
   {
-    firstname: "Lena",
-    lastname_initial: "B.",
-    age: 18,
-    gender: "Female",
-    region: "North Rhine-Westphalia, Germany",
-    enrollment_status: "Freshman",
-    eligibility: "NCAA Div 2, NAIA",
-    start_term: "Fall 2027",
-    start_year: 2027,
-    class_of: 2027,
-    graduation_year: 2026,
-    gpa: "3.60",
-    gpa_numeric: 3.6,
-    potential_major: "Environmental Studies",
-    duolingo_date: "Dec 2025",
-    duolingo_score: "120",
-    sat_act_date: "Nov 2025",
-    sat_act_score: "SAT 1210",
+    id: "demo-jonas-t",
+    sport: "Soccer",
+    name: "Jonas T.",
+    photo: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-05-02",
+    // Committed athletes: list shows only the stamp + schools, profile only the Athletics tab
+    committed: ["Morningside University", "Iowa Western Community College"],
+    available_in: "Fall 2025",
+    eligibility: "D1, D2, NAIA",
+    academic_status: "Transfer",
+    list: { position: "AM", secondary_position: "CM", division: "NAIA" },
+    personal: { sex: "Male", date_of_birth: "2005-04-21", nationality: "German" },
+    academics: {},
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      info: {
+        main_position: "Offensive Midfielder",
+        secondary_position: "Central Midfielder",
+        height: "176 cm / 5.8 feet",
+        weight: "64.0 kg / 140 pounds",
+        foot: "Right",
+        school: "Morningside University / NAIA",
+      },
+      seasons: [
+        { season: "2023/2024", league: "4th Amateur", games_played: "20", games_started: "17", goals: "3", assists: "9" },
+        { season: "2024/2025", league: "Morningside University / NAIA", games_played: "5", goals: "1" },
+      ],
+      successes: {},
+    },
+    multimedia: { videos: [], photos: [] },
+  },
+  {
+    id: "demo-sarah-l",
+    sport: "Track and Field, Cross Country",
+    name: "Sarah L.",
+    photo: "https://images.unsplash.com/photo-1552675811-a8d68084c895?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-06-20",
+    committed: null,
+    available_in: "Fall 2027",
+    eligibility: "D1, D2, D3, NAIA",
+    academic_status: "Transfer",
+    list: { summary: [{ label: "Personal Bests", value: "800m: 2:05.42 min | 1500m: 4:18.15 min" }] },
+    personal: { sex: "Female", date_of_birth: "2006-02-11", nationality: "German" },
+    academics: {
+      graduation: "2024",
+      gpa: "3.7",
+      enrollment: "Enrolled (2 semesters)",
+      potential_major: "Psychology",
+      duolingo: "140",
+      sat_cr: "650",
+      sat_m: "620",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      info: {
+        height: "168 cm / 5.6 feet",
+        weight: "58.0 kg / 128 pounds",
+        club: "LG Olympia Dortmund",
+        disciplines: "800m",
+        further_disciplines: "1500m, Cross Country",
+        training_units_per_week: "8",
+        training_hours_per_week: "14",
+        role_in_team: "I lead our warm-ups and help the younger middle-distance group with pacing.",
+        strengths: "Tactical racing and a strong finishing kick.",
+        athletic_progression: "<strong>2024</strong><ul><li>800m: 2:08.60 min</li></ul><strong>2025</strong><ul><li>800m: 2:05.42 min</li><li>1500m: 4:18.15 min</li></ul>",
+        personal_bests: "<strong>800m: 2:05.42 min</strong><br><strong>1500m: 4:18.15 min</strong>",
+      },
+      successes: {
+        local: "Westphalian Champion 800m 2025",
+        national: "German U20 Championships 2025 – 4th Place 800m",
+        international: "European U20 Championships 2025 – Semifinal 800m",
+      },
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1461896836934-ffe607c9380e?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1571008887538-b36bbaf4fe83?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1452626038306-9bf093d8b957?w=400&h=300&fit=crop",
+      ],
+    },
+  },
+  {
+    id: "demo-jana-k",
+    sport: "Track and Field, Cross Country",
+    name: "Jana K.",
+    photo: "https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-07-01",
+    committed: null,
+    available_in: "Fall 2027",
+    eligibility: "D1, D2, NAIA, JUCO",
+    academic_status: "Freshman",
+    list: { summary: [{ label: "Personal Bests", value: "100m: 12.07 sec | 200m: 24.81 sec" }] },
+    personal: { sex: "Female", date_of_birth: "2008-05-09", nationality: "German" },
+    academics: {
+      graduation: "Summer 2027",
+      gpa: "Expected: 3.3-3.7",
+      enrollment: "Not yet enrolled",
+      potential_major: "Pre Med",
+      sat_cr: "2026-10-03",
+      sat_m: "2026-10-03",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      info: {
+        height: "170 cm / 5.7 feet",
+        weight: "57.0 kg / 126 pounds",
+        club: "TV Wattenscheid 01",
+        disciplines: "100m",
+        further_disciplines: "200m, 4 × 100 m relay",
+        training_units_per_week: "6",
+        training_hours_per_week: "12",
+        role_in_team: "Start runner of our 4 × 100 m relay.",
+        strengths: "Explosive start and acceleration.",
+        athletic_progression: "<strong>2025</strong><ul><li>100m: 12.31 sec</li></ul><strong>2026</strong><ul><li>100m: 12.07 sec</li><li>200m: 24.81 sec</li></ul>",
+        personal_bests: "<strong>100m: 12.07 sec</strong><br><strong>200m: 24.81 sec</strong>",
+      },
+      successes: {
+        local: "North Rhine Champion 100m 2026",
+        national: "German Youth Championships 2026 – 6th Place 4 × 100 m relay",
+      },
+    },
+    multimedia: { videos: [], photos: [] },
+  },
+  {
+    id: "demo-chantal-v",
+    sport: "Swimming",
+    name: "Chantal V.",
+    photo: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-06-10",
+    committed: null,
+    available_in: "Fall 2028",
+    eligibility: "D2, NAIA",
+    academic_status: "Freshman",
+    list: {
+      summary: [
+        { label: "Personal Bests", value: "100m freestyle: LCM/SCY: 56.40 | LCM/SCY: 49.60" },
+        { label: "", value: "100m butterfly: LCM/SCY: 1:02.15 | LCM/SCY: 54.90" },
+      ],
+    },
+    personal: { sex: "Female", date_of_birth: "2009-01-27", nationality: "Dutch" },
+    academics: {
+      graduation: "2028",
+      gpa: "3.3-3.7",
+      enrollment: "Not yet enrolled",
+      potential_major: "Biological Sciences",
+      duolingo: "2026-09-12",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+      info: {
+        height: "178 cm / 5.10 feet",
+        weight: "67.0 kg / 148 pounds",
+        club: "PSV Eindhoven",
+        disciplines: "Freestyle",
+        further_disciplines: "Butterfly",
+        training_units_per_week: "9",
+        training_hours_per_week: "20",
+        role_in_team: "Anchor of our 4 × 100 free relay.",
+        strengths: "Fast starts and strong underwater dolphin kick.",
+        personal_bests: "<p><strong>LCM</strong></p><p>100 free 56.40 → <strong>49.60 SCY</strong><br>100 fly 1:02.15 → <strong>54.90 SCY</strong></p>",
+        performance_development: "<strong>100 free (LCM)</strong><p>2024: 57.30<br>2025: 56.40</p><strong>100 fly (LCM)</strong><p>2024: 1:03.02<br>2025: 1:02.15</p>",
+      },
+      successes: {
+        local: "Brabant Champion 100 free 2025",
+        national: "Dutch Junior Nationals 2025 – Final 100 free",
+      },
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1519315901247-f9ef1c2df5a0?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
+      ],
+    },
+  },
+  {
+    id: "demo-felix-b",
+    sport: "Swimming",
+    name: "Felix B.",
+    photo: "https://images.unsplash.com/photo-1600965962361-9035dbfd1c50?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-07-05",
+    committed: null,
+    available_in: "Fall 2027",
+    eligibility: "D1, D2, NAIA",
+    academic_status: "Freshman",
+    list: {
+      summary: [
+        { label: "Personal Bests", value: "50m freestyle: LCM/SCY: 24.10 | LCM/SCY: 20.95" },
+        { label: "", value: "100m backstroke: LCM/SCY: 59.80 | LCM/SCY: 51.70" },
+      ],
+    },
+    personal: { sex: "Male", date_of_birth: "2007-06-24", nationality: "German" },
+    academics: {
+      graduation: "2027",
+      gpa: "3.0-3.3",
+      enrollment: "Not yet enrolled",
+      potential_major: "Physics",
+      duolingo: "2026-07-20",
+      sat_cr: "540",
+      sat_m: "600",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+      info: {
+        height: "186 cm / 6.1 feet",
+        weight: "78.0 kg / 172 pounds",
+        club: "SG Neukölln Berlin",
+        disciplines: "Freestyle",
+        further_disciplines: "Backstroke",
+        training_units_per_week: "8",
+        training_hours_per_week: "16",
+        role_in_team: "Quiet but committed; I lead by example in training.",
+        strengths: "Goal-oriented, strong turns and finishing speed.",
+        personal_bests: "<p><strong>LCM</strong></p><p>50 free 24.10 → <strong>20.95 SCY</strong><br>100 back 59.80 → <strong>51.70 SCY</strong></p>",
+        performance_development: "<strong>50 free (LCM)</strong><p>2024: 24.92<br>2025: 24.41<br>2026: 24.10</p>",
+      },
+      successes: {
+        local: "3x Berlin State Champion",
+        national: "German Junior Championships 2026 – Final 50 free",
+      },
+    },
+    multimedia: { videos: [], photos: [] },
+  },
+  {
+    id: "demo-moritz-a",
+    sport: "Golf",
+    name: "Moritz A.",
+    photo: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-07-10",
+    committed: null,
+    available_in: "Fall 2027",
+    eligibility: "D1, D2, D3, NAIA",
+    academic_status: "Freshman",
+    list: { summary: [{ label: "HCP", value: "-1.6" }, { label: "Stroke Average", value: "73.2" }] },
+    personal: { sex: "Male", date_of_birth: "2008-02-03", nationality: "German" },
+    academics: {
+      graduation: "2027",
+      gpa: "Expected 3.5",
+      enrollment: "Not yet enrolled",
+      potential_major: "Economics",
+      duolingo: "May 2026",
+      sat_cr: "560",
+      sat_m: "610",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      info: {
+        club: "GC St. Leon-Rot",
+        current_league: "1. Bundesliga (1st German League)",
+        strength_on_course: "Putting & Driving",
+        weaknesses_on_course: "Long irons",
+        mentality_on_course: "Calm under pressure; I stick to my game plan.",
+        development_potential: "Approach shots from 150–180 yards",
+        hcp: "-1.6",
+        carry_7_iron: "170 / 186 yards",
+        carry_driver: "270 / 295 yards",
+        driver_swing_speed: "118",
+        average_greens_hit: "12",
+        role_in_team: "Regular starter in the Bundesliga team.",
+      },
+      golf_results: [
+        { year: "2025", placement: "13th", tournament: "German Boys Championship", cr: "73", slope: "127", par: "72", r1: "79", r2: "74", r3: "77", r4: "" },
+        { year: "2026", placement: "T10", tournament: "Bavarian Championship U18", cr: "72.5", slope: "136", par: "72", r1: "76", r2: "76", r3: "82", r4: "" },
+        { year: "2026", placement: "1", tournament: "Kick-off Open", cr: "72.4", slope: "126", par: "72", r1: "70", r2: "", r3: "", r4: "" },
+      ],
+      successes: {
+        local: "2/2 wins Ranking tournaments BWGV Boys",
+        national: "German Team Championship 2025 – 1st Place",
+        international: "GJGT French Classic 2025 – 3rd Place",
+        miscellaneous: "WAGR 1600",
+      },
+    },
+    multimedia: { videos: [], photos: [] },
+  },
+  {
+    id: "demo-niklas-h",
+    sport: "Basketball",
+    name: "Niklas H.",
+    photo: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-06-28",
+    committed: null,
+    available_in: "Fall 2026",
+    eligibility: "D1, D2, NAIA, JUCO",
+    academic_status: "Freshman",
+    list: { summary: [{ label: "Position", value: "Point guard, Shooting guard | Height: 6'3''" }, { label: "Highest league played", value: "NBBL" }] },
+    personal: { sex: "Male", date_of_birth: "2007-01-19", nationality: "German" },
+    academics: {
+      graduation: "2025",
+      gpa: "3.1",
+      enrollment: "Not yet enrolled",
+      potential_major: "Communications",
+      duolingo: "110",
+      act: "22",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
+      info: {
+        main_position: "Point Guard",
+        secondary_position: "Shooting Guard",
+        height: "190 cm / 6.3 feet",
+        weight: "82.0 kg / 181 pounds",
+        club: "ALBA Berlin",
+        current_league: "NBBL / 2. Regionalliga",
+        highest_league: "NBBL",
+        role_in_team: "On-court general and vocal leader.",
+        strengths: "Pick-and-roll decisions and defensive footwork.",
+      },
+      seasons: [
+        { season: "2024/2025", league: "NBBL", club: "ALBA Berlin", position: "Point Guard", secondary_position: "Shooting Guard", g: "18", mpg: "24", ppg: "12.1", ftp: "78", three_pp: "36", rpg: "3.2", apg: "5.4", stl: "1.6", to: "2.1", link: "https://www.example.com/stats" },
+        { season: "2025/2026", league: "NBBL", club: "ALBA Berlin", position: "Point Guard", secondary_position: "Shooting Guard", g: "20", mpg: "29", ppg: "16.4", ftp: "81", three_pp: "41", rpg: "3.9", apg: "6.2", stl: "1.9", to: "2.4" },
+      ],
+      successes: {
+        local: "Berlin State Champion U18 2025",
+        national: "NBBL All-Star 2026",
+      },
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1519861537509-b785668017ad?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=300&fit=crop",
+      ],
+    },
+  },
+  {
+    id: "demo-lukas-m",
+    sport: "Tennis",
+    name: "Lukas M.",
+    photo: "https://images.unsplash.com/photo-1622279457126-a79205ffae38?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-05-30",
+    committed: null,
+    available_in: "Fall 2026",
+    eligibility: "D1, D2",
+    academic_status: "Freshman",
+    list: { summary: [] },
+    personal: { sex: "Male", date_of_birth: "2007-08-30", nationality: "German" },
+    academics: {
+      graduation: "2025",
+      gpa: "3.8",
+      enrollment: "Not yet enrolled",
+      potential_major: "Business Administration",
+      duolingo: "125",
+      sat_cr: "660",
+      sat_m: "680",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      info: {
+        height: "188 cm / 6.2 feet",
+        weight: "79.0 kg / 174 pounds",
+        club: "TC Rot-Weiß Düsseldorf",
+        current_league: "Regionalliga West",
+        strength_on_course: "Serve-forehand combination.",
+        mentality_on_course: "I stay calm no matter the score.",
+      },
+      successes: {
+        national: "German U18 Singles Runner-Up 2025",
+      },
+      rankings: [
+        { label: "UTR", value: "Singles 12.4" },
+        { label: "German Ranking", value: "LK 3.6" },
+      ],
+      best_matches: "Win vs. ITF Top-300 junior (6:4, 7:5)",
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1554068865-24cecd4e1b11?w=400&h=300&fit=crop",
+      ],
+    },
+  },
+  {
+    id: "demo-finn-w",
+    sport: "Rowing",
+    name: "Finn W.",
+    photo: "https://images.unsplash.com/photo-1517649763962-0c62306601b7?w=600&h=750&fit=crop",
+    profile_url: "",
+    last_updated: "2026-06-25",
+    committed: null,
+    available_in: "Fall 2026",
+    eligibility: "D1",
+    academic_status: "Graduate",
+    list: { summary: [{ label: "2k erg test", value: "5:58.2 min" }] },
+    personal: { sex: "Male", date_of_birth: "2004-03-08", nationality: "German" },
+    academics: {
+      graduation: "2022",
+      gpa: "3.9",
+      enrollment: "Bachelor completed",
+      potential_major: "Aerospace Engineering (M.S.)",
+      duolingo: "145",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      info: {
+        height: "198 cm / 6.6 feet",
+        weight: "93.0 kg / 205 pounds",
+        exercised_since: "2016",
+        disciplines: "8+ ; 4- ; 2-",
+        training_hours_per_week: "20",
+        erg_2000m: "2026 5:58.2 min",
+        role_in_team: "Stroke seat; I set the rhythm for the crew.",
+        strengths: "Leverage, endurance and catch mechanics.",
+        still_to_improve: "Sculling technique in small boats.",
+      },
+      successes: {
+        national: "German U23 Champion 8+ 2024",
+        international: "Henley Royal Regatta 2025 – Semifinal Temple Cup",
+      },
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1544551763-77efdedddd72?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
+      ],
+    },
+  },
+  {
+    id: "demo-lena-b",
     sport: "Field hockey",
-    position: "Forward / Striker",
-    height: "5'5\" (165 cm)",
-    weight: "135 lbs (61 kg)",
-    personal_bests: [
-      { value: "4.12", unit: "sec", label: "30m Sprint" },
-    ],
-    season_stats: [
-      { value: "15", unit: "goals", label: "Goals" },
-      { value: "9", unit: "assists", label: "Assists" },
-    ],
-    achievements: ["State junior select forward"],
-    club: "Kölner THC Stadion Rot-Weiß",
-    current_league: "1. Bundesliga Jugend",
-    highest_league: "2. Regionalliga (adult)",
-    training_hours: "15 hrs/week",
-    team_role: "High-pressing attacker",
-    personal_strengths: ["Stick skills in tight spaces", "Clinical finishing"],
-    image: "https://images.unsplash.com/photo-1599586120424-d291457962e6?w=600&h=750&fit=crop",
-    gallery: [
-      "https://images.unsplash.com/photo-1577223625816-7544f4d80882?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1551958214-2d59cc7460a8?w=400&h=300&fit=crop",
-    ],
-    highlight_reel: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+    name: "Lena B.",
+    photo: "https://images.unsplash.com/photo-1599586120424-d291457962e6?w=600&h=750&fit=crop",
+    profile_url: "",
     last_updated: "2026-06-05",
-    teaser: "Prolific forward from Germany's premier youth hockey league.",
+    committed: null,
+    available_in: "Fall 2027",
+    eligibility: "D1, D2, NAIA",
+    academic_status: "Freshman",
+    list: { summary: [{ label: "Position", value: "Forward" }, { label: "Highest league played", value: "2. Regionalliga (adult)" }] },
+    personal: { sex: "Female", date_of_birth: "2008-04-17", nationality: "German" },
+    academics: {
+      graduation: "2026",
+      gpa: "3.6",
+      enrollment: "Not yet enrolled",
+      potential_major: "Environmental Studies",
+      duolingo: "120",
+      sat_cr: "600",
+      sat_m: "610",
+    },
+    athletics: {
+      promotion_video: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+      info: {
+        main_position: "Forward",
+        secondary_position: "Midfielder",
+        regular_player: "Yes",
+        height: "165 cm / 5.5 feet",
+        weight: "61.0 kg / 134 pounds",
+        club: "Kölner THC Stadion Rot-Weiß",
+        role_in_team: "High-pressing attacker and penalty corner specialist.",
+        strengths: "Stick skills in tight spaces and clinical finishing.",
+      },
+      seasons: [
+        { season: "2025/2026", league: "1. Bundesliga Jugend", club: "Kölner THC Stadion Rot-Weiß", position: "Forward", secondary_position: "Midfielder", games_played: "16", games_started: "14", goals: "15", assists: "9" },
+      ],
+      successes: {
+        national: "German Youth Indoor Championships 2025 – 3rd Place",
+      },
+    },
+    multimedia: {
+      videos: [],
+      photos: [
+        "https://images.unsplash.com/photo-1577223625816-7544f4d80882?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1551958214-2d59cc7460a8?w=400&h=300&fit=crop",
+      ],
+    },
   },
 ];
 
+/* ---------- State & filters ---------- */
+
 /** Only athletes with photos are shown (photos mandatory) */
-const visibleAthletes = athletes.filter((a) => a.image);
+const visibleAthletes = athletes.filter((a) => a.photo);
 
 const state = {
   sport: "",
@@ -610,50 +990,98 @@ function resetFilters() {
   render(getSorted(visibleAthletes));
 }
 
-function matchDivision(eligibility, divisions) {
+/** Eligibility as on WordPress: "D1, D2, D3, NAIA, JUCO, Canada" */
+function eligibilityTokens(a) {
+  return (a.eligibility || "").split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function matchDivision(a, divisions) {
   if (!divisions.length) return true;
-  const e = eligibility.toLowerCase();
-  return divisions.some((d) => e.includes(d.toLowerCase()));
+  const tokens = eligibilityTokens(a);
+  return divisions.some((d) => tokens.includes(d));
 }
 
 function filtered() {
   return visibleAthletes.filter((a) => {
     if (state.sport && a.sport !== state.sport) return false;
-    if (state.gender && a.gender !== state.gender) return false;
-    if (!matchDivision(a.eligibility, state.divisions)) return false;
-    if (state.statuses.length && !state.statuses.includes(a.enrollment_status)) return false;
-    if (state.starts.length && !state.starts.includes(a.start_term)) return false;
+    if (state.gender && a.personal?.sex !== state.gender) return false;
+    if (!matchDivision(a, state.divisions)) return false;
+    if (state.statuses.length && !state.statuses.includes(a.academic_status)) return false;
+    if (state.starts.length && !state.starts.includes(a.available_in)) return false;
     if (state.search) {
-      const haystack = [a.position, a.region, a.club].join(" ").toLowerCase();
+      const info = a.athletics?.info || {};
+      const haystack = [
+        a.name, info.main_position, info.secondary_position, info.position, info.disciplines,
+        info.further_disciplines, info.club, a.personal?.nationality,
+      ].join(" ").toLowerCase();
       if (!haystack.includes(state.search)) return false;
     }
     return true;
   });
 }
 
+/** GPA on WordPress is free text ("Expected GPA 3.9", "3.0-3.3") — sort by first number */
+function gpaNumber(a) {
+  const match = String(a.academics?.gpa || "").match(/\d(?:[.,]\d+)?/);
+  return match ? parseFloat(match[0].replace(",", ".")) : 0;
+}
+
+/** "Spring 2027" < "Fall 2027" */
+function startValue(a) {
+  const match = String(a.available_in || "").match(/(Spring|Fall)?\s*(\d{4})/i);
+  if (!match) return Infinity;
+  return Number(match[2]) + (/fall/i.test(match[1] || "") ? 0.5 : 0);
+}
+
 function getSorted(list) {
   const sorted = [...list];
   if (state.sort === "gpa") {
-    sorted.sort((a, b) => (b.gpa_numeric || 0) - (a.gpa_numeric || 0));
+    sorted.sort((a, b) => gpaNumber(b) - gpaNumber(a));
   } else if (state.sort === "start") {
-    sorted.sort((a, b) => (a.start_year || 0) - (b.start_year || 0));
+    sorted.sort((a, b) => startValue(a) - startValue(b));
   } else {
     sorted.sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated));
   }
   return sorted;
 }
 
-function displayName(a) {
-  return `${a.firstname} ${a.lastname_initial}`;
+/* ---------- Helpers ---------- */
+
+function isEmpty(v) {
+  return v === undefined || v === null || String(v).trim() === "";
 }
 
-function classOf(a) {
-  return `Class of ${a.class_of || a.graduation_year + 1}`;
+/** Age in years from date_of_birth (WordPress shows "23 years" in the list) */
+function ageOf(a) {
+  const dob = a.personal?.date_of_birth;
+  if (!dob) return null;
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  return age;
+}
+
+/** Short athletic line for card + profile header */
+function headline(a) {
+  const info = a.athletics?.info || {};
+  if (a.sport === "Soccer" && a.list?.position) {
+    return a.list.secondary_position ? `${a.list.position} (${a.list.secondary_position})` : a.list.position;
+  }
+  return info.main_position || info.position || info.disciplines || summaryText(a) || info.club || "";
+}
+
+function summaryText(a) {
+  const first = a.list?.summary?.[0];
+  if (!first) return "";
+  return first.label ? `${first.label}: ${first.value}` : first.value;
 }
 
 function youtubeId(url) {
   if (!url) return "";
-  const match = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
+  const match = url.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
   return match ? match[1] : "";
 }
 
@@ -661,13 +1089,109 @@ function playIconSvg() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
 }
 
-function highlightReelThumbHtml(a, contextClass) {
-  if (!a.highlight_reel) return "";
+/**
+ * WordPress values are often rich text (strong, br, p, ul/li, links).
+ * Plain strings keep their line breaks; HTML is reduced to a safe tag whitelist.
+ */
+const RICH_TAGS = new Set(["B", "STRONG", "I", "EM", "U", "BR", "P", "UL", "OL", "LI", "A", "SPAN"]);
+const DROP_TAGS = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED"]);
+
+function sanitizeNode(node) {
+  [...node.childNodes].forEach((child) => {
+    if (child.nodeType === Node.COMMENT_NODE) {
+      child.remove();
+      return;
+    }
+    if (child.nodeType !== Node.ELEMENT_NODE) return;
+    if (DROP_TAGS.has(child.tagName)) {
+      child.remove();
+      return;
+    }
+    sanitizeNode(child);
+    if (!RICH_TAGS.has(child.tagName)) {
+      child.replaceWith(...child.childNodes);
+      return;
+    }
+    const href = child.getAttribute("href");
+    [...child.attributes].forEach((attr) => child.removeAttribute(attr.name));
+    if (child.tagName === "A") {
+      if (href && /^(https?:|mailto:)/i.test(href)) {
+        child.setAttribute("href", href);
+        child.setAttribute("target", "_blank");
+        child.setAttribute("rel", "noopener");
+      }
+    }
+  });
+}
+
+function richText(value) {
+  if (isEmpty(value)) return "—";
+  const s = String(value);
+  if (!/<[a-z][\s\S]*>/i.test(s)) return escapeHtml(s).replace(/\n/g, "<br>");
+  const tpl = document.createElement("template");
+  tpl.innerHTML = s;
+  sanitizeNode(tpl.content);
+  return tpl.innerHTML;
+}
+
+function linkHtml(value) {
+  if (isEmpty(value)) return "—";
+  const s = String(value).trim();
+  if (!/^https?:\/\//i.test(s)) return escapeHtml(s);
+  return `<a href="${escapeAttr(s)}" target="_blank" rel="noopener">${escapeHtml(s)}</a>`;
+}
+
+function fieldValueHtml(field, value) {
+  if (field.type === "long") return richText(value);
+  if (field.type === "link") return linkHtml(value);
+  return escapeHtml(formatValue(value));
+}
+
+function formatValue(v) {
+  if (isEmpty(v)) return "—";
+  return String(v);
+}
+
+/** Renders schema fields that have a value (empty template rows are skipped) */
+function detailRows(fields, data) {
+  return fields
+    .filter((field) => data && !isEmpty(data[field.key]))
+    .map((field) => `
+      <div class="detail-row${field.type === "long" ? " detail-row--wide" : ""}">
+        <dt>${escapeHtml(field.label)}</dt>
+        <dd data-field="${escapeAttr(field.key)}">${fieldValueHtml(field, data[field.key])}</dd>
+      </div>`)
+    .join("");
+}
+
+function sectionHtml(title, body) {
+  if (!body) return "";
   return `
-    <button type="button" class="card-video-thumb ${contextClass || ""}" data-video="${escapeAttr(a.highlight_reel)}" aria-label="Play highlight reel for ${escapeAttr(displayName(a))}">
-      <span class="card-reel-label">Highlight Reel</span>
+    <section class="profile-section">
+      <h4 class="profile-section-title">${escapeHtml(title)}</h4>
+      ${body}
+    </section>`;
+}
+
+/* ---------- Cards ---------- */
+
+function highlightReelThumbHtml(a) {
+  const url = a.athletics?.promotion_video;
+  if (!url) return "";
+  return `
+    <button type="button" class="card-video-thumb" data-video="${escapeAttr(url)}" aria-label="Play promotion video for ${escapeAttr(a.name)}">
+      <span class="card-reel-label">Promotion Video</span>
       <span class="card-play-btn">${playIconSvg()}</span>
     </button>`;
+}
+
+function committedHtml(a, contextClass) {
+  if (!a.committed?.length) return "";
+  return `
+    <div class="committed ${contextClass || ""}">
+      <span class="committed-stamp">Committed</span>
+      <span class="committed-text">${a.committed.map(escapeHtml).join(' <span class="committed-plane" aria-hidden="true">✈</span> ')}</span>
+    </div>`;
 }
 
 function render(list) {
@@ -687,26 +1211,28 @@ function render(list) {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "athlete-card";
-    card.setAttribute("aria-label", `View profile: ${displayName(a)}`);
+    card.setAttribute("aria-label", `View profile: ${a.name}`);
 
-    const divisions = (a.eligibility || "").split(",").slice(0, 2).map((s) => s.trim());
+    const age = ageOf(a);
+    const metaParts = [a.committed ? "" : a.available_in, age ? `${age} years` : "", a.committed ? "" : a.academic_status].filter(Boolean);
 
     card.innerHTML = `
       <div class="card-media">
-        <img src="${escapeAttr(a.image)}" alt="${escapeAttr(displayName(a))}" loading="lazy">
+        <img src="${escapeAttr(a.photo)}" alt="${escapeAttr(a.name)}" loading="lazy">
         <span class="card-sport-badge">${escapeHtml(a.sport)}</span>
         ${highlightReelThumbHtml(a)}
       </div>
       <div class="card-body">
-        <h3 class="card-name">${escapeHtml(displayName(a))}</h3>
+        <h3 class="card-name">${escapeHtml(a.name)}</h3>
         <div class="card-meta-line">
-          <span class="card-position">${escapeHtml(a.position)}</span>
-          <span class="card-class">${escapeHtml(classOf(a))}</span>
+          <span class="card-position">${escapeHtml(headline(a))}</span>
+          <span class="card-class">${escapeHtml(metaParts.join(" · "))}</span>
         </div>
+        ${committedHtml(a, "committed--card")}
       </div>
       <div class="card-footer">
         <div class="card-meta-pills">
-          ${divisions.map((d) => `<span>${escapeHtml(d)}</span>`).join("")}
+          ${eligibilityTokens(a).map((d) => `<span>${escapeHtml(d)}</span>`).join("")}
         </div>
         <span class="btn-card-view">View profile →</span>
       </div>
@@ -716,7 +1242,7 @@ function render(list) {
     if (videoBtn) {
       videoBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        openVideo(a.highlight_reel, displayName(a));
+        openVideo(a.athletics.promotion_video, a.name);
       });
     }
 
@@ -725,170 +1251,171 @@ function render(list) {
   });
 }
 
-function dataPointsHtml(items) {
-  if (!items || !items.length) return "—";
-  return `<div class="data-points">${items
-    .map(
-      (item) => `
-      <span class="data-point">
-        <span class="data-point-value">${escapeHtml(item.value)}</span>
-        ${item.unit ? `<span class="data-point-unit">${escapeHtml(item.unit)}</span>` : ""}
-        <span class="data-point-label">${escapeHtml(item.label)}</span>
-      </span>`
-    )
-    .join("")}</div>`;
-}
+/* ---------- Profile tabs ---------- */
 
-function listHtml(items) {
-  if (!items || !items.length) return "—";
-  if (Array.isArray(items)) {
-    return `<ul class="detail-list">${items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>`;
-  }
-  return escapeHtml(String(items));
-}
-
-function getAthleticKeys(sport) {
-  if (SPORT_ATHLETIC_KEYS[sport]) return SPORT_ATHLETIC_KEYS[sport];
-  const base = ["position", "height", "weight", "personal_bests", "season_stats", "achievements", "club", "training_hours", "personal_strengths"];
-  const teamSports = new Set([
-    "American Football", "Baseball", "Basketball", "Field hockey", "Ice hockey",
-    "Soccer", "Volleyball", "Waterpolo", "Wrestling",
-  ]);
-  if (teamSports.has(sport)) {
-    return [...base, "current_league", "highest_league", "team_role"];
-  }
-  return [...base, "highest_league"];
-}
-
-function getAthleticFields(a) {
-  const keys = getAthleticKeys(a.sport);
-  return keys.map((key) => {
-    const label = ATHLETIC_LABELS[key];
-    if (key === "personal_bests" || key === "season_stats") {
-      return { label, key, structured: true, wide: true };
-    }
-    if (key === "personal_strengths" || key === "achievements") {
-      return { label, key, list: true, wide: true };
-    }
-    return { label, key };
-  });
-}
-
-function fieldRows(fields, athlete) {
-  return fields
-    .map(([label, key]) => {
-      const val = athlete[key];
-      return `
-      <div class="detail-row">
-        <dt>${escapeHtml(label)}</dt>
-        <dd data-field="contact.${key}">${escapeHtml(formatValue(val))}</dd>
-      </div>`;
-    })
+function seasonsHtml(a, schema) {
+  const seasons = a.athletics?.seasons;
+  if (!schema.seasons || !seasons?.length) return "";
+  const blocks = seasons
+    .map((s) => `
+      <div class="season-block">
+        <h5 class="season-block-title">Season ${escapeHtml(s.season || "")}</h5>
+        <dl class="detail-grid">${detailRows(schema.seasons.fields, s)}</dl>
+      </div>`)
     .join("");
+  return sectionHtml(schema.seasons.title, blocks);
 }
 
-function athleticRows(a) {
-  return getAthleticFields(a)
-    .map((field) => {
-      const val = a[field.key];
-      let content;
-      if (field.structured) {
-        content = dataPointsHtml(val);
-      } else if (field.list) {
-        content = listHtml(val);
-      } else {
-        content = escapeHtml(formatValue(val));
-      }
-      return `
-      <div class="detail-row${field.wide ? " detail-row--wide" : ""}">
-        <dt>${escapeHtml(field.label)}</dt>
-        <dd data-field="contact.${field.key}">${content}</dd>
-      </div>`;
-    })
-    .join("");
-}
-
-function performanceChartHtml(a) {
-  if (!MEASURABLE_SPORTS.has(a.sport) || !a.performance_seasons?.length) return "";
-  const rows = a.performance_seasons
-    .map(
-      (s) => `
-      <tr>
-        <td>${escapeHtml(s.season)}</td>
-        <td>${escapeHtml(s.metric)}</td>
-        <td class="metric-value">${escapeHtml(s.value)}</td>
-      </tr>`
-    )
-    .join("");
-  return `
-    <div class="performance-chart">
-      <h4>Performance Development</h4>
-      <table class="season-table">
-        <thead>
-          <tr><th>Season</th><th>Metric</th><th>Result</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
+function golfResultsHtml(a, schema) {
+  const rows = a.athletics?.golf_results;
+  if (!schema.golfResults || !rows?.length) return "";
+  const table = `
+    <div class="table-scroll">
+      <table class="season-table golf-table">
+        <thead><tr>${GOLF_RESULT_COLUMNS.map(([label]) => `<th>${escapeHtml(label)}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${rows.map((r) => `<tr>${GOLF_RESULT_COLUMNS.map(([, key]) => `<td>${escapeHtml(r[key] || "")}</td>`).join("")}</tr>`).join("")}
+        </tbody>
       </table>
     </div>`;
+  return sectionHtml("Golf Results", table);
 }
 
-function galleryHtml(a) {
-  if (!a.gallery?.length) return "";
-  return `
-    <div class="profile-gallery">
-      <h3>Action Photos</h3>
-      <div class="gallery-grid">
-        ${a.gallery.map((src) => `<img src="${escapeAttr(src)}" alt="${escapeAttr(displayName(a))} in action" loading="lazy">`).join("")}
-      </div>
-    </div>`;
+function rankingsHtml(a, schema) {
+  const ath = a.athletics || {};
+  let out = "";
+  if (schema.rankings && ath.rankings?.length) {
+    const rows = ath.rankings
+      .map((r) => `
+        <div class="detail-row">
+          <dt>${escapeHtml(r.label)}</dt>
+          <dd>${richText(r.value)}</dd>
+        </div>`)
+      .join("");
+    out += sectionHtml("Rankings", `<dl class="detail-grid">${rows}</dl>`);
+  }
+  if (schema.bestMatches && !isEmpty(ath.best_matches)) {
+    out += sectionHtml("Best Matches", `<div class="rich-text">${richText(ath.best_matches)}</div>`);
+  }
+  return out;
+}
+
+function athleticsPanelHtml(a) {
+  const schema = getSchema(a.sport);
+  const ath = a.athletics || {};
+  // Committed profiles on WordPress also carry a "School" row
+  const infoFields = ath.info?.school ? [...schema.info, f("School", "school")] : schema.info;
+  const info = detailRows(infoFields, ath.info);
+  const successes = detailRows(schema.successes.fields, ath.successes);
+  return [
+    sectionHtml("Athletic information", info && `<dl class="detail-grid">${info}</dl>`),
+    seasonsHtml(a, schema),
+    sectionHtml(schema.successes.title, successes && `<dl class="detail-grid">${successes}</dl>`),
+    golfResultsHtml(a, schema),
+    rankingsHtml(a, schema),
+  ].join("");
+}
+
+function multimediaPanelHtml(a) {
+  const mm = a.multimedia || {};
+  const videos = [
+    ...(a.athletics?.promotion_video ? [{ title: "Promotion video", url: a.athletics.promotion_video }] : []),
+    ...(mm.videos || []),
+  ];
+  const videoList = videos.length
+    ? `<ul class="video-list">${videos
+        .map((v) => `
+          <li>
+            <button type="button" class="video-link" data-video="${escapeAttr(v.url)}">
+              <span class="video-link-icon">${playIconSvg()}</span>
+              <span>${escapeHtml(v.title || v.url)}</span>
+            </button>
+          </li>`)
+        .join("")}</ul>`
+    : "";
+  const photos = mm.photos?.length
+    ? `<div class="gallery-grid">${mm.photos
+        .map((src) => `<img src="${escapeAttr(src)}" alt="${escapeAttr(a.name)} in action" loading="lazy">`)
+        .join("")}</div>`
+    : "";
+  const body = sectionHtml("Videos", videoList) + sectionHtml("Photos", photos);
+  return body || `<p class="panel-empty">No multimedia available yet.</p>`;
+}
+
+function personalPanelHtml(a) {
+  return `<dl class="detail-grid">${detailRows(PERSONAL_FIELDS, a.personal)}</dl>`;
+}
+
+function academicsPanelHtml(a) {
+  const data = a.academics || {};
+  const fields = ACADEMIC_FIELDS.filter((fld) => !fld.optional || !isEmpty(data[fld.key]));
+  const rows = fields
+    .map((fld) => `
+      <div class="detail-row">
+        <dt>${escapeHtml(fld.label)}</dt>
+        <dd data-field="${escapeAttr(fld.key)}">${escapeHtml(formatValue(data[fld.key]))}</dd>
+      </div>`)
+    .join("");
+  const available = `
+      <div class="detail-row">
+        <dt>Available in</dt>
+        <dd data-field="available_in">${escapeHtml(formatValue(a.available_in))}</dd>
+      </div>`;
+  return `<dl class="detail-grid">${rows}${available}</dl>`;
 }
 
 function profileReelHtml(a) {
-  if (!a.highlight_reel) return "";
+  const url = a.athletics?.promotion_video;
+  if (!url) return "";
   return `
     <div>
-      <span class="profile-reel-label">Highlight Reel</span>
-      <button type="button" class="profile-reel-thumb" data-video="${escapeAttr(a.highlight_reel)}" aria-label="Play highlight reel">
-        <img src="${escapeAttr(a.image)}" alt="">
+      <span class="profile-reel-label">Promotion Video</span>
+      <button type="button" class="profile-reel-thumb" data-video="${escapeAttr(url)}" aria-label="Play promotion video">
+        <img src="${escapeAttr(a.photo)}" alt="">
         <span class="card-play-btn">${playIconSvg()}</span>
       </button>
     </div>`;
 }
 
-function formatValue(v) {
-  if (v === undefined || v === null || v === "") return "—";
-  return String(v);
-}
-
 function openProfile(a) {
   selectedAthlete = a;
+  const committed = Boolean(a.committed?.length);
+  // Committed profiles on WordPress only show the Athletics tab and no contact button
+  const tabs = committed
+    ? [["athletics", "Athletics"]]
+    : [["athletics", "Athletics"], ["multimedia", "Multimedia"], ["personal", "Personal"], ["academics", "Academics"]];
+  const panels = {
+    athletics: athleticsPanelHtml,
+    multimedia: multimediaPanelHtml,
+    personal: personalPanelHtml,
+    academics: academicsPanelHtml,
+  };
+  const meta = [a.sport, headline(a), committed ? "" : `Available ${a.available_in}`].filter(Boolean).join(" · ");
+
   els.profileContent.innerHTML = `
     <div class="profile-hero">
-      <img class="profile-hero-photo" src="${escapeAttr(a.image)}" alt="${escapeAttr(displayName(a))}">
+      <img class="profile-hero-photo" src="${escapeAttr(a.photo)}" alt="${escapeAttr(a.name)}">
       <div class="profile-hero-main">
         <div class="profile-name-row">
-          <h2 id="profile-modal-title">${escapeHtml(displayName(a))}</h2>
+          <h2 id="profile-modal-title">${escapeHtml(a.name)}</h2>
         </div>
-        <p class="profile-hero-meta">${escapeHtml(a.sport)} · ${escapeHtml(a.position)} · ${escapeHtml(classOf(a))}</p>
+        <p class="profile-hero-meta">${escapeHtml(meta)}</p>
+        ${committedHtml(a, "committed--hero")}
+        ${committed ? "" : `
         <div class="profile-actions">
-          <button type="button" class="btn-primary" id="btn-recruit-open">Contact about ${escapeHtml(a.firstname)}</button>
-        </div>
+          <button type="button" class="btn-primary" id="btn-recruit-open">I am interested</button>
+        </div>`}
       </div>
       ${profileReelHtml(a)}
     </div>
-    ${galleryHtml(a)}
     <div class="profile-body">
       <nav class="profile-tabs" role="tablist">
-        <button type="button" class="profile-tab active" data-tab="personal" role="tab">Personal & Academic</button>
-        <button type="button" class="profile-tab" data-tab="athletic" role="tab">Athletic</button>
+        ${tabs.map(([key, label], i) => `<button type="button" class="profile-tab${i === 0 ? " active" : ""}" data-tab="${key}" role="tab">${label}</button>`).join("")}
       </nav>
-      <section class="profile-panel active" id="panel-personal" role="tabpanel">
-        <dl class="detail-grid">${fieldRows(getPersonalFields(a), a)}</dl>
-      </section>
-      <section class="profile-panel" id="panel-athletic" role="tabpanel">
-        <dl class="detail-grid">${athleticRows(a)}</dl>
-        ${performanceChartHtml(a)}
-      </section>
+      ${tabs.map(([key], i) => `
+      <section class="profile-panel${i === 0 ? " active" : ""}" id="panel-${key}" role="tabpanel">
+        ${panels[key](a)}
+      </section>`).join("")}
     </div>
   `;
 
@@ -901,27 +1428,32 @@ function openProfile(a) {
     });
   });
 
-  const reelBtn = els.profileContent.querySelector(".profile-reel-thumb");
-  if (reelBtn) {
-    reelBtn.addEventListener("click", () => openVideo(a.highlight_reel, displayName(a)));
-  }
+  els.profileContent.querySelectorAll("[data-video]").forEach((btn) => {
+    btn.addEventListener("click", () => openVideo(btn.dataset.video, a.name));
+  });
 
-  document.getElementById("btn-recruit-open").addEventListener("click", () => openRecruit(a));
+  const recruitBtn = document.getElementById("btn-recruit-open");
+  if (recruitBtn) recruitBtn.addEventListener("click", () => openRecruit(a));
   els.profileModal.showModal();
 }
 
+/* ---------- Contact & video ---------- */
+
 function openRecruit(a) {
   selectedAthlete = a;
-  els.recruitTitle.textContent = `Contact about ${a.firstname}`;
-  els.recruitLabel.textContent = `${displayName(a)} · ${a.sport} · ${a.position}`;
+  els.recruitTitle.textContent = `I am interested in ${a.name}`;
+  els.recruitLabel.textContent = `${a.name} · ${a.sport} · ${headline(a)}`;
   els.recruitForm.reset();
   els.recruitModal.showModal();
 }
 
 function openVideo(url, title) {
   const id = youtubeId(url);
-  if (!id) return;
-  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" title="Highlight reel: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  if (!id) {
+    if (url) window.open(url, "_blank", "noopener");
+    return;
+  }
+  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   els.videoModal.showModal();
 }
 
@@ -940,15 +1472,13 @@ function onRecruitSubmit(e) {
   const message = document.getElementById("coach-message").value.trim();
   const a = selectedAthlete;
 
-  const subject = encodeURIComponent(
-    `Recruit inquiry: ${a.firstname} ${a.lastname_initial} (${a.sport})`
-  );
+  const subject = encodeURIComponent(`Recruit inquiry: ${a.name} (${a.sport})`);
   const body = encodeURIComponent(
     `Recruitment inquiry from For Coaches page\n\n` +
-      `Athlete: ${displayName(a)}\n` +
+      `Athlete: ${a.name}\n` +
       `Sport: ${a.sport}\n` +
-      `Position: ${a.position}\n` +
-      `Expected start: ${a.start_term}\n` +
+      `Position / Discipline: ${headline(a) || "—"}\n` +
+      `Available in: ${a.available_in}\n` +
       `Eligibility: ${a.eligibility}\n\n` +
       `University: ${university}\n` +
       `Coach email: ${email}\n` +

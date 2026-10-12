@@ -1372,6 +1372,166 @@ a:hover {
   font-weight: 700;
 }
 
+/* Profile sections (mirror the WordPress profile tables) */
+.profile-section + .profile-section {
+  margin-top: 1.5rem;
+}
+
+.profile-section-title {
+  font-family: var(--font-body);
+  font-size: var(--label-size);
+  font-weight: var(--label-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sb-pink);
+  margin-bottom: 0.75rem;
+}
+
+.season-block {
+  padding: 0.85rem 1rem;
+  background: var(--sb-off-white);
+  border-left: 4px solid var(--sb-gold);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.season-block + .season-block {
+  margin-top: 0.75rem;
+}
+
+.season-block .detail-row {
+  background: #fff;
+}
+
+.season-block-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  color: var(--sb-navy-deep);
+  margin-bottom: 0.6rem;
+}
+
+.detail-row dd p + p,
+.rich-text p + p {
+  margin-top: 0.4rem;
+}
+
+.detail-row dd ul,
+.rich-text ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.detail-row dd a,
+.rich-text a {
+  color: var(--sb-royal);
+  word-break: break-all;
+}
+
+.rich-text {
+  font-size: var(--value-size);
+  color: var(--sb-navy-deep);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.golf-table {
+  min-width: 640px;
+}
+
+.video-list {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.video-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  border: 1px solid rgba(35, 51, 100, 0.12);
+  background: var(--sb-off-white);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: var(--value-size);
+  font-weight: 600;
+  color: var(--sb-navy-deep);
+  text-align: left;
+  cursor: pointer;
+}
+
+.video-link:hover {
+  border-color: var(--sb-pink);
+}
+
+.video-link-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-pink);
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.video-link-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.panel-empty {
+  font-size: var(--value-size);
+  color: var(--sb-navy);
+}
+
+/* Committed athletes */
+.committed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.committed-stamp {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 2px solid var(--sb-pink);
+  border-radius: var(--radius-sm);
+  color: var(--sb-pink);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transform: rotate(-3deg);
+}
+
+.committed--card .committed-text {
+  color: #fff;
+}
+
+.committed--card .committed-stamp,
+.committed--hero .committed-stamp {
+  border-color: var(--sb-gold);
+  color: var(--sb-gold);
+}
+
+.committed-plane {
+  margin: 0 0.15rem;
+}
+
 .modal-title {
   font-family: var(--font-display);
   font-size: 1.6rem;
@@ -1525,6 +1685,26 @@ a:hover {
 
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-body {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .profile-tabs {
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .profile-tab {
+    font-size: 0.85rem;
+    padding: 0.55rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .committed--hero {
+    justify-content: center;
   }
 
   .footer-main {

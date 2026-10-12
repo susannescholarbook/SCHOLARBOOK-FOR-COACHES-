@@ -27,12 +27,25 @@ Live-Quelle (Wahrheit): GitHub-Repo
 |---|---|
 | `index.html` | Seitenstruktur (Header, Hero, Filter, Grid, Trust-Sektionen, Footer, Modals) |
 | `styles.css` | Komplettes Design-System (Farben, Schriften, Karten, Footer, Profil-Modal) |
-| `app.js` | **Inhalt + Logik**: Athletendaten-Array, Filter, Sortierung, Karten-/Profil-Rendering, Kontakt-Formular (mailto) |
+| `app.js` | **Inhalt + Logik**: Feld-Schema je Sportart (`SPORT_SCHEMAS`), Athletendaten-Array, Filter, Sortierung, Karten-/Profil-Rendering, Kontakt-Formular (mailto) |
+| `FELDER.md` | **Feld-Mapping WordPress → `app.js`** (alle Sportarten, Grundlage für die Datenübernahme) |
 | `Images/` | Scholarbook-Logos (JPEG). Genutzt: `Scholarbook_Logo_Farbe breit 4c.jpg` in Header + Footer |
 | `favicon (1).ico` | Favicon |
 | `Scholarbook_ForCoaches (1) (2).html` | **Design-Referenz** vom Head of Marketing — Quelle des angewandten Designs. Nicht Teil der Live-Seite, nur Vorlage. |
 
 **Athletendaten ändern** = das `athletes`-Array in `app.js` bearbeiten.
+
+### Datenmodell (entspricht den WordPress-Profilen)
+
+Jedes Profil hat die Tabs **Athletics, Multimedia, Personal, Academics** wie auf
+official.scholarbook.net/for-coaches. Die Athletics-Felder unterscheiden sich je
+Sportart und sind in `SPORT_SCHEMAS` definiert (Labels wörtlich aus WordPress).
+Sonderfälle: **Golf** hat eine Turniertabelle (`golf_results`), Soccer/Basketball/
+Field hockey haben Saison-Statistiken (`seasons`), Tennis hat Rankings + Best Matches,
+Track & Field heißt „Greatest Achievements“ statt „Successes“. Viele Felder sind
+Rich-Text (HTML aus WordPress) → werden über `richText()` mit Tag-Whitelist gerendert.
+Committed-Athleten (`committed`) zeigen nur den Athletics-Tab, ohne Kontakt-Button.
+Details: `FELDER.md`.
 
 ## Design-System (Kurzreferenz)
 
@@ -57,12 +70,22 @@ Live-Quelle (Wahrheit): GitHub-Repo
   zu **einem Hero zusammengeführt** (so wie im Marketing-Design).
 - Das Logo wird als **Datei aus `Images/`** verlinkt (Header + Footer),
   nicht mehr als Inline-Base64 → `index.html` bleibt schlank (~15 KB).
+- **Okt. 2026:** Profilfelder 1:1 an die WordPress-Profile angeglichen (alle 428
+  Live-Profile ausgewertet). Dabei ersetzt: strukturierte „Personal Bests/Season
+  Stats“-Kacheln und die „Performance Development“-Tabelle durch die WordPress-Felder
+  (Rich-Text bzw. Saisonblöcke). Kontakt-Button heißt wie live „I am interested“.
+  Division-Filter arbeitet mit den WordPress-Kürzeln (D1, D2, NAIA, JUCO).
 
 ## Offene Aufgaben (TODO)
 
-1. **Vier kaputte Athletenfotos**: tote externe Unsplash-Links in `app.js`
-   für **Finn W., Sarah L., Lena B., Lukas M.** → durch funktionierende
-   Bild-URLs oder lokale Fotos (z. B. in `Images/`) ersetzen.
+1. **Kaputte Athletenfotos**: tote externe Unsplash-Links in `app.js` —
+   Profilbilder von **Finn W., Sarah L., Lena B., Lukas M.** sowie mehrere
+   Galeriebilder (Sarah L., Matteo K., Chantal V., Niklas H., Lukas M., Finn W.,
+   Lena B.) → durch funktionierende Bild-URLs oder lokale Fotos ersetzen.
+5. **Fehlende Live-Filter** nachbauen (siehe Ende von `FELDER.md`): GPA-, TOEFL-,
+   Duolingo-, SAT-Bereiche, Soccer-Position, Track-&-Field-Disziplinen.
+6. **Kontaktformular** an live angleichen (Contact Type, Name, Location, Team-Website,
+   Scholarship amount, Attachment).
 2. **Footer-Rechtslinks** (Legal Notice, Data Protection, Contract
    Termination) zeigen auf Platzhalter-URLs → echte Ziele setzen.
 3. **Social-Media-Links** im Footer sind vermutete Handles → verifizieren.
