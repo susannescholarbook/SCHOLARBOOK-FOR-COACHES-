@@ -849,6 +849,12 @@ const athletes = [
 
 /* ---------- State & filters ---------- */
 
+/**
+ * Optional local-only profiles (e.g. real WordPress profiles for design comparison),
+ * loaded from real-profiles.local.js — git-ignored, never pushed.
+ */
+if (Array.isArray(window.LOCAL_ATHLETES)) athletes.push(...window.LOCAL_ATHLETES);
+
 /** Only athletes with photos are shown (photos mandatory) */
 const visibleAthletes = athletes.filter((a) => a.photo);
 
