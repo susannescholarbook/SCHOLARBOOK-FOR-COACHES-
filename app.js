@@ -1594,8 +1594,21 @@ function rememberYoutubeConsent() {
   }
 }
 
+/**
+ * YouTube requires the embedding page's origin as referrer (otherwise "Error 153").
+ * Opening index.html as a local file (file://) has no origin → videos only play on a real web address.
+ */
 function embedYoutube(id, title) {
-  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  if (window.location.protocol === "file:") {
+    els.videoEmbed.innerHTML = `
+      <div class="video-consent">
+        <p class="video-consent-title">Video not available offline</p>
+        <p>YouTube videos only play when this page is opened from a web address, not as a local file.</p>
+        <a class="btn-primary" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Watch on YouTube</a>
+      </div>`;
+    return;
+  }
+  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
 }
 
 function openVideo(url, title) {
