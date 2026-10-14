@@ -364,7 +364,7 @@ const athletes = [
       videos: [{ title: "GK session", url: "https://www.youtube.com/watch?v=ysz5S6PUM-U" }],
       photos: [
         "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1508098682722-e89c9a5890d5?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1581978711930-045f3f8af12e?w=400&h=300&fit=crop",
       ],
     },
   },
@@ -405,7 +405,7 @@ const athletes = [
     id: "demo-sarah-l",
     sport: "Track and Field, Cross Country",
     name: "Sarah L.",
-    photo: "https://images.unsplash.com/photo-1552675811-a8d68084c895?w=600&h=750&fit=crop",
+    photo: "https://images.unsplash.com/photo-1552209841-d2dc5fd68a30?w=600&h=750&fit=crop",
     profile_url: "",
     last_updated: "2026-06-20",
     committed: null,
@@ -447,9 +447,9 @@ const athletes = [
     multimedia: {
       videos: [],
       photos: [
-        "https://images.unsplash.com/photo-1461896836934-ffe607c9380e?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1571008887538-b36bbaf4fe83?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1452626038306-9bf093d8b957?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1526676537331-7747bf8278fc?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1728060560980-e39712526b7a?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1698671823406-035c77ff6fcd?w=400&h=300&fit=crop",
       ],
     },
   },
@@ -544,7 +544,7 @@ const athletes = [
     multimedia: {
       videos: [],
       photos: [
-        "https://images.unsplash.com/photo-1519315901247-f9ef1c2df5a0?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1560090995-01632a28895b?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
       ],
     },
@@ -696,7 +696,7 @@ const athletes = [
     multimedia: {
       videos: [],
       photos: [
-        "https://images.unsplash.com/photo-1519861537509-b785668017ad?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1629901925121-8a141c2a42f4?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=400&h=300&fit=crop",
       ],
     },
@@ -705,7 +705,7 @@ const athletes = [
     id: "demo-lukas-m",
     sport: "Tennis",
     name: "Lukas M.",
-    photo: "https://images.unsplash.com/photo-1622279457126-a79205ffae38?w=600&h=750&fit=crop",
+    photo: "https://images.unsplash.com/photo-1714840961998-8d6c02ace00b?w=600&h=750&fit=crop",
     profile_url: "",
     last_updated: "2026-05-30",
     committed: null,
@@ -746,7 +746,7 @@ const athletes = [
       videos: [],
       photos: [
         "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1554068865-24cecd4e1b11?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=300&fit=crop",
       ],
     },
   },
@@ -754,7 +754,7 @@ const athletes = [
     id: "demo-finn-w",
     sport: "Rowing",
     name: "Finn W.",
-    photo: "https://images.unsplash.com/photo-1517649763962-0c62306601b7?w=600&h=750&fit=crop",
+    photo: "https://images.unsplash.com/photo-1569406125624-98ee19b01d4a?w=600&h=750&fit=crop",
     profile_url: "",
     last_updated: "2026-06-25",
     committed: null,
@@ -791,8 +791,8 @@ const athletes = [
     multimedia: {
       videos: [],
       photos: [
-        "https://images.unsplash.com/photo-1544551763-77efdedddd72?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1601670463842-210f77e864e0?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1491911923017-19f90d8d7f83?w=400&h=300&fit=crop",
       ],
     },
   },
@@ -800,7 +800,7 @@ const athletes = [
     id: "demo-lena-b",
     sport: "Field hockey",
     name: "Lena B.",
-    photo: "https://images.unsplash.com/photo-1599586120424-d291457962e6?w=600&h=750&fit=crop",
+    photo: "https://images.unsplash.com/photo-1541983663620-7571a820610c?w=600&h=750&fit=crop",
     profile_url: "",
     last_updated: "2026-06-05",
     committed: null,
@@ -840,8 +840,8 @@ const athletes = [
     multimedia: {
       videos: [],
       photos: [
-        "https://images.unsplash.com/photo-1577223625816-7544f4d80882?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1551958214-2d59cc7460a8?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1734159319354-b9ead78dd441?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1573459635481-85e9012c05c6?w=400&h=300&fit=crop",
       ],
     },
   },
@@ -855,15 +855,62 @@ const athletes = [
  */
 if (Array.isArray(window.LOCAL_ATHLETES)) athletes.push(...window.LOCAL_ATHLETES);
 
+/**
+ * Optional live data source: URL returning { athletes: [...] } in the FELDER.md format
+ * (planned: endpoint of the WordPress plugin).
+ * Empty → demo data only. For tests without editing: index.html?api=<webhook URL>
+ */
+const ATHLETES_API_URL = "";
+
+function apiUrl() {
+  try {
+    const override = new URLSearchParams(window.location.search).get("api");
+    if (override && /^(https:\/\/|http:\/\/localhost[:/])/i.test(override)) return override;
+  } catch (e) {
+    /* ignore */
+  }
+  return ATHLETES_API_URL;
+}
+
 /** Only athletes with photos are shown (photos mandatory) */
-const visibleAthletes = athletes.filter((a) => a.photo);
+let visibleAthletes = [];
+
+function setAthletes(list) {
+  visibleAthletes = list.filter((a) => a.photo);
+}
+
+async function loadLiveAthletes(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20000);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data.athletes) || !data.athletes.length) throw new Error("no athletes in response");
+    return data.athletes;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function showDataNotice(message) {
+  let el = document.getElementById("data-notice");
+  if (!el) {
+    el = document.createElement("p");
+    el.id = "data-notice";
+    el.className = "data-notice";
+    els.grid.before(el);
+  }
+  el.textContent = message;
+}
 
 const state = {
   sport: "",
   gender: "",
   divisions: [],
   statuses: [],
-  starts: [],
+  /** filters.js groups: group key → selected option labels */
+  extra: {},
   search: "",
   sort: "updated",
 };
@@ -892,10 +939,27 @@ function cacheElements() {
   els.videoClose = document.getElementById("video-close");
 }
 
-function init() {
+async function init() {
   cacheElements();
   populateSportSelect();
   bindFilters();
+  renderExtraFilters();
+
+  const url = apiUrl();
+  if (!url) {
+    setAthletes(athletes);
+    render(getSorted(filtered()));
+    return;
+  }
+
+  els.grid.innerHTML = `<div class="empty-state"><h3>Loading athletes…</h3></div>`;
+  try {
+    setAthletes(await loadLiveAthletes(url));
+  } catch (e) {
+    console.warn("Live athlete data unavailable, showing demo profiles:", e);
+    setAthletes(athletes);
+    showDataNotice("Live data is currently unavailable – showing demo profiles.");
+  }
   render(getSorted(filtered()));
 }
 
@@ -911,6 +975,7 @@ function populateSportSelect() {
 function bindFilters() {
   els.sport.addEventListener("change", () => {
     state.sport = els.sport.value;
+    renderExtraFilters();
     render(getSorted(filtered()));
   });
 
@@ -945,10 +1010,6 @@ function bindFilters() {
 
   document.querySelectorAll("#filter-status .pill").forEach((pill) => {
     pill.addEventListener("click", () => togglePill(pill, state.statuses, () => render(getSorted(filtered()))));
-  });
-
-  document.querySelectorAll("#filter-start .pill").forEach((pill) => {
-    pill.addEventListener("click", () => togglePill(pill, state.starts, () => render(getSorted(filtered()))));
   });
 
   els.clear.addEventListener("click", resetFilters);
@@ -988,12 +1049,68 @@ function resetFilters() {
   state.gender = "";
   state.divisions = [];
   state.statuses = [];
-  state.starts = [];
+  state.extra = {};
   state.search = "";
   els.sport.value = "";
   els.search.value = "";
   document.querySelectorAll(".toggle-btn.active, .pill.active").forEach((el) => el.classList.remove("active"));
+  renderExtraFilters();
   render(getSorted(visibleAthletes));
+}
+
+/** Filter groups from filters.js; sport-specific groups only while that sport is selected */
+function extraGroups() {
+  return (window.SB_FILTERS?.groups || []).filter((g) => !g.sport || g.sport === state.sport);
+}
+
+function renderExtraFilters() {
+  const container = document.getElementById("filter-extra");
+  if (!container) return;
+  const visible = extraGroups();
+  // Drop selections of groups that are no longer shown (e.g. Soccer position after switching sport)
+  Object.keys(state.extra).forEach((key) => {
+    if (!visible.some((g) => g.key === key)) delete state.extra[key];
+  });
+  // Collapsible to keep the sidebar short (important on phones, where filters sit above the results)
+  container.innerHTML = visible
+    .map((g) => {
+      const selected = state.extra[g.key] || [];
+      const open = g.key === "position" || selected.length || openFilterGroups.has(g.key);
+      return `
+      <details class="filter-group filter-group--collapsible" data-group="${escapeAttr(g.key)}"${open ? " open" : ""}>
+        <summary class="filter-label">${escapeHtml(g.label)}<span class="filter-count">${selected.length || ""}</span></summary>
+        <div class="pill-group" role="group" aria-label="${escapeAttr(g.label)}">
+          ${g.options
+            .map((o) => `<button type="button" class="pill${selected.includes(o.label) ? " active" : ""}" data-group="${escapeAttr(g.key)}" data-value="${escapeAttr(o.label)}">${escapeHtml(o.label)}</button>`)
+            .join("")}
+        </div>
+      </details>`;
+    })
+    .join("");
+  container.querySelectorAll("details").forEach((d) => {
+    d.addEventListener("toggle", () => {
+      if (d.open) openFilterGroups.add(d.dataset.group);
+      else openFilterGroups.delete(d.dataset.group);
+    });
+  });
+  container.querySelectorAll(".pill").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const list = (state.extra[pill.dataset.group] = state.extra[pill.dataset.group] || []);
+      togglePill(pill, list, () => render(getSorted(filtered())));
+      pill.closest("details").querySelector(".filter-count").textContent = list.length || "";
+    });
+  });
+}
+
+/** Filter groups the visitor has expanded (kept when the sport changes) */
+const openFilterGroups = new Set();
+
+function matchExtraFilters(a) {
+  return extraGroups().every((g) => {
+    const selected = state.extra[g.key] || [];
+    if (!selected.length) return true;
+    return g.options.some((o) => selected.includes(o.label) && o.test(a));
+  });
 }
 
 /** Eligibility as on WordPress: "D1, D2, D3, NAIA, JUCO, Canada" */
@@ -1013,7 +1130,7 @@ function filtered() {
     if (state.gender && a.personal?.sex !== state.gender) return false;
     if (!matchDivision(a, state.divisions)) return false;
     if (state.statuses.length && !state.statuses.includes(a.academic_status)) return false;
-    if (state.starts.length && !state.starts.includes(a.available_in)) return false;
+    if (!matchExtraFilters(a)) return false;
     if (state.search) {
       const info = a.athletics?.info || {};
       const haystack = [
@@ -1026,10 +1143,10 @@ function filtered() {
   });
 }
 
-/** GPA on WordPress is free text ("Expected GPA 3.9", "3.0-3.3") — sort by first number */
+/** GPA on WordPress is free text ("Expected GPA 3.9", "3.0-3.3") — sort by the highest value */
 function gpaNumber(a) {
-  const match = String(a.academics?.gpa || "").match(/\d(?:[.,]\d+)?/);
-  return match ? parseFloat(match[0].replace(",", ".")) : 0;
+  const n = window.SB_FILTERS ? window.SB_FILTERS.gpaOf(a) : NaN;
+  return Number.isNaN(n) ? 0 : n;
 }
 
 /** "Spring 2027" < "Fall 2027" */
@@ -1046,7 +1163,8 @@ function getSorted(list) {
   } else if (state.sort === "start") {
     sorted.sort((a, b) => startValue(a) - startValue(b));
   } else {
-    sorted.sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated));
+    // WordPress profiles have no date → stable sort keeps the WordPress order
+    sorted.sort((a, b) => (Date.parse(b.last_updated) || 0) - (Date.parse(a.last_updated) || 0));
   }
   return sorted;
 }
@@ -1453,13 +1571,55 @@ function openRecruit(a) {
   els.recruitModal.showModal();
 }
 
+/**
+ * YouTube is only contacted after the visitor's consent (two-click solution).
+ * "Always load" is remembered per browser; in WordPress this can be replaced by the Borlabs content blocker.
+ */
+const YOUTUBE_CONSENT_KEY = "sb-youtube-consent";
+const PRIVACY_URL = "https://www.scholarbook.net/en/privacy";
+
+function hasYoutubeConsent() {
+  try {
+    return localStorage.getItem(YOUTUBE_CONSENT_KEY) === "1";
+  } catch (e) {
+    return false;
+  }
+}
+
+function rememberYoutubeConsent() {
+  try {
+    localStorage.setItem(YOUTUBE_CONSENT_KEY, "1");
+  } catch (e) {
+    /* storage unavailable: consent applies to this video only */
+  }
+}
+
+function embedYoutube(id, title) {
+  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+}
+
 function openVideo(url, title) {
   const id = youtubeId(url);
   if (!id) {
     if (url) window.open(url, "_blank", "noopener");
     return;
   }
-  els.videoEmbed.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1" title="Video: ${escapeAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  if (hasYoutubeConsent()) {
+    embedYoutube(id, title);
+  } else {
+    els.videoEmbed.innerHTML = `
+      <div class="video-consent">
+        <p class="video-consent-title">YouTube video</p>
+        <p>This video is hosted on YouTube. When you load it, data such as your IP address is transferred to YouTube (Google).
+          More in our <a href="${PRIVACY_URL}" target="_blank" rel="noopener">privacy policy</a>.</p>
+        <button type="button" class="btn-primary" id="video-consent-load">Load video</button>
+        <label class="video-consent-always"><input type="checkbox" id="video-consent-always"> Always load YouTube videos</label>
+      </div>`;
+    document.getElementById("video-consent-load").addEventListener("click", () => {
+      if (document.getElementById("video-consent-always").checked) rememberYoutubeConsent();
+      embedYoutube(id, title);
+    });
+  }
   els.videoModal.showModal();
 }
 
@@ -1472,10 +1632,7 @@ function onRecruitSubmit(e) {
   e.preventDefault();
   if (!selectedAthlete) return;
 
-  const university = document.getElementById("coach-university").value.trim();
-  const email = document.getElementById("coach-email").value.trim();
-  const phone = document.getElementById("coach-phone").value.trim();
-  const message = document.getElementById("coach-message").value.trim();
+  const value = (id) => document.getElementById(id).value.trim() || "(not provided)";
   const a = selectedAthlete;
 
   const subject = encodeURIComponent(`Recruit inquiry: ${a.name} (${a.sport})`);
@@ -1486,10 +1643,15 @@ function onRecruitSubmit(e) {
       `Position / Discipline: ${headline(a) || "—"}\n` +
       `Available in: ${a.available_in}\n` +
       `Eligibility: ${a.eligibility}\n\n` +
-      `University: ${university}\n` +
-      `Coach email: ${email}\n` +
-      `Phone/WhatsApp: ${phone || "(not provided)"}\n` +
-      `Message: ${message || "(not provided)"}\n\n` +
+      `Contact type: ${value("contact-type")}\n` +
+      `Name: ${value("coach-name")}\n` +
+      `University: ${value("coach-university")}\n` +
+      `Location: ${value("coach-location")}\n` +
+      `Team website: ${value("coach-website")}\n` +
+      `Email: ${value("coach-email")}\n` +
+      `Cell phone: ${value("coach-phone")}\n` +
+      `Estimated scholarship per year: ${value("coach-scholarship")}\n` +
+      `Message: ${value("coach-message")}\n\n` +
       `---\n` +
       `Sent via Scholarbook For Coaches directory`
   );

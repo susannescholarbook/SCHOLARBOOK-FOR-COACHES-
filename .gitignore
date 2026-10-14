@@ -1,5 +1,5 @@
 # Local-only data (real athlete profiles for comparison) — never commit
 *.local.js
 
-# Local sync test output (real athlete data)
-n8n/.cache/
+# Local-only working folder (parser prototype, test data with real athlete data) — not part of the repo
+n8n/

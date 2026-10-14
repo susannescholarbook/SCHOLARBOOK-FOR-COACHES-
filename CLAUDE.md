@@ -18,8 +18,8 @@ Live-Quelle (Wahrheit): GitHub-Repo
 
 - Reines **statisches HTML/CSS/JS**, **kein Build-Schritt**, keine
   Abhängigkeiten/npm. Einfach `index.html` im Browser öffnen.
-- Schriften über Google Fonts (Barlow Condensed, Yellowtail, Montserrat).
-- Athletenfotos: aktuell externe Unsplash-URLs (siehe offene Aufgaben).
+- Schriften **lokal** in `fonts/` (Barlow Condensed, Montserrat, Yellowtail) – keine Anfragen an Google.
+- Demo-Athletenfotos: externe Unsplash-URLs (alle geprüft, 14.10.2026).
 
 ## Dateien
 
@@ -28,12 +28,23 @@ Live-Quelle (Wahrheit): GitHub-Repo
 | `index.html` | Seitenstruktur (Header, Hero, Filter, Grid, Trust-Sektionen, Footer, Modals) |
 | `styles.css` | Komplettes Design-System (Farben, Schriften, Karten, Footer, Profil-Modal) |
 | `app.js` | **Inhalt + Logik**: Feld-Schema je Sportart (`SPORT_SCHEMAS`), Athletendaten-Array, Filter, Sortierung, Karten-/Profil-Rendering, Kontakt-Formular (mailto) |
+| `filters.js` | Filterlogik wie auf der Live-Seite (GPA, TOEFL, Duolingo, SAT, Start, Soccer-Position, T&F-Disziplinen) |
+| `fonts/` | Selbst gehostete Schriften + `fonts.css` |
 | `FELDER.md` | **Feld-Mapping WordPress → `app.js`** (alle Sportarten, Grundlage für die Datenübernahme) |
+| `real-profiles.local.js` | *Nur lokal, git-ignoriert:* 3 echte Profile für Design-Vergleiche (nie pushen) |
 | `Images/` | Scholarbook-Logos (JPEG). Genutzt: `Scholarbook_Logo_Farbe breit 4c.jpg` in Header + Footer |
 | `favicon (1).ico` | Favicon |
 | `Scholarbook_ForCoaches (1) (2).html` | **Design-Referenz** vom Head of Marketing — Quelle des angewandten Designs. Nicht Teil der Live-Seite, nur Vorlage. |
 
-**Athletendaten ändern** = das `athletes`-Array in `app.js` bearbeiten.
+**Athletendaten:** Gepflegt werden die echten Profile in **WordPress**
+(official.scholarbook.net, Plugin `scholarbook-profile-master`, keine REST-API).
+**Geplanter Zielweg (Okt. 2026): Variante C – ein eigenes WordPress-Plugin** zeigt das
+neue Design abgekapselt auf einer neuen Seite und liest die öffentlichen For-Coaches-Seiten
+per WP-Cron aus (Auswertungslogik liegt lokal, nicht im Repo, als Vorlage für den PHP-Port). Der
+Entwickler übernimmt Code-Review, Staging, Server-Cron, Wordfence/Cache, Borlabs und
+Go-live. Nächster Schritt: Server-Infos aus WordPress (PHP-Version, Plugins, Permalinks).
+`app.js` kann Daten von `ATHLETES_API_URL` laden (oder `?api=<url>` zum Testen);
+leer oder nicht erreichbar → Demo-Profile aus dem `athletes`-Array.
 
 ### Datenmodell (entspricht den WordPress-Profilen)
 
@@ -70,26 +81,35 @@ Details: `FELDER.md`.
   zu **einem Hero zusammengeführt** (so wie im Marketing-Design).
 - Das Logo wird als **Datei aus `Images/`** verlinkt (Header + Footer),
   nicht mehr als Inline-Base64 → `index.html` bleibt schlank (~15 KB).
-- **Okt. 2026:** Profilfelder 1:1 an die WordPress-Profile angeglichen (alle 428
+- **Okt. 2026:** Profilfelder 1:1 an die WordPress-Profile angeglichen (alle 400
   Live-Profile ausgewertet). Dabei ersetzt: strukturierte „Personal Bests/Season
   Stats“-Kacheln und die „Performance Development“-Tabelle durch die WordPress-Felder
   (Rich-Text bzw. Saisonblöcke). Kontakt-Button heißt wie live „I am interested“.
   Division-Filter arbeitet mit den WordPress-Kürzeln (D1, D2, NAIA, JUCO).
+- **Okt. 2026 — Datenweg:** WordPress bleibt Pflege- und Veröffentlichungssystem.
+  Weg „öffentliche Seiten auslesen“ gewählt (keine Änderung an `scholarbook-profile-master` nötig).
+  Echte Profildaten nie als Datei ins öffentliche Repo.
+- **Okt. 2026 — Zielplattform:** GitHub Pages ist nur Testumgebung. Webflow (Hauptseite)
+  geprüft: US-Anbieter, Nachbau + API-Sync aufwendig. EU-Static-Hoster möglich.
+  Gewählt wegen Kosten: **Variante C, direkt in WordPress** per Plugin. Ein n8n-Ansatz wurde
+  verworfen (kein n8n vorhanden) und ist nicht Teil des Repos.
+- **Okt. 2026 — Datenschutz-Basics:** Schriften lokal; YouTube erst nach Klick-Zustimmung
+  (`sb-youtube-consent` in localStorage bei „Always load“); Footer-/Social-Links auf die
+  echten Ziele der Hauptseite (/en/imprint, /en/privacy, /en/vertrag-kundigen, facebook.com/sportstipendium).
+- **Okt. 2026 — Filter & Formular:** Live-Filter nachgebaut und gegen die Live-Seite abgeglichen
+  (Details in `FELDER.md`); Filtergruppen aufklappbar. Kontaktformular mit den Live-Feldern
+  (mailto; Anhang erst mit dem Plugin, Hinweis im Formular).
+- **Echte Profildaten nie ins Repo** (Repo ist öffentlich): `*.local.js` und lokale
+  Arbeitsordner (`n8n/`) sind git-ignoriert. Kein Link zum WordPress-Originalprofil auf der Seite.
 
 ## Offene Aufgaben (TODO)
 
-1. **Kaputte Athletenfotos**: tote externe Unsplash-Links in `app.js` —
-   Profilbilder von **Finn W., Sarah L., Lena B., Lukas M.** sowie mehrere
-   Galeriebilder (Sarah L., Matteo K., Chantal V., Niklas H., Lukas M., Finn W.,
-   Lena B.) → durch funktionierende Bild-URLs oder lokale Fotos ersetzen.
-5. **Fehlende Live-Filter** nachbauen (siehe Ende von `FELDER.md`): GPA-, TOEFL-,
-   Duolingo-, SAT-Bereiche, Soccer-Position, Track-&-Field-Disziplinen.
-6. **Kontaktformular** an live angleichen (Contact Type, Name, Location, Team-Website,
-   Scholarship amount, Attachment).
-2. **Footer-Rechtslinks** (Legal Notice, Data Protection, Contract
-   Termination) zeigen auf Platzhalter-URLs → echte Ziele setzen.
-3. **Social-Media-Links** im Footer sind vermutete Handles → verifizieren.
-4. Optional: Veröffentlichung über **GitHub Pages** einrichten (siehe README).
+1. **WordPress-Plugin (Variante C)** bauen – nach Eingang der Server-Infos; danach
+   Übergabe-Paket (ZIP, Briefing, Test-Checkliste) an den Entwickler.
+2. **Kontaktformular im Plugin** serverseitig versenden (inkl. Anhang), statt mailto.
+3. Optional: Live-Daten-Anbindung (`ATHLETES_API_URL`) an die Plugin-Datenquelle anschließen.
+
+GitHub Pages ist aktiv: https://susannescholarbook.github.io/SCHOLARBOOK-FOR-COACHES-/
 
 ## Lokale Vorschau
 

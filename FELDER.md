@@ -1,7 +1,7 @@
 # Feld-Mapping WordPress → Dummy-Seite
 
 Abgleich der Profilfelder von **official.scholarbook.net/de/for-coaches/** (WordPress)
-mit dem Datenmodell in `app.js`. Stand: 12.10.2026, ausgewertet wurden **alle 428 Live-Profile**
+mit dem Datenmodell in `app.js`. Stand: 12.10.2026, ausgewertet wurden **alle 400 Live-Profile**
 aus 12 Sportarten mit Profilen.
 
 Die Labels in `app.js` (`SPORT_SCHEMAS`, `PERSONAL_FIELDS`, `ACADEMIC_FIELDS`) sind **wörtlich**
@@ -158,10 +158,21 @@ Role in the team · Miscellaneous information
   `School` wird bei Committed-Profilen angezeigt; andere Einzelfälle beim Import prüfen.
 - Duolingo/SAT enthalten entweder einen Score oder ein (geplantes) Testdatum.
 
-## Filter auf der Live-Seite (noch nicht alle in der Dummy-Seite)
+## Filter (wie auf der Live-Seite, Logik in `filters.js`)
 
-Alle Sportarten: Gender · Coaching Division · Academic Status · GPA-Bereich · TOEFL-Bereich ·
-Duolingo-Bereich · SAT-Bereich · Start of studies.
-Zusätzlich **Soccer:** Athlete Position · **Track & Field:** Disziplinen (Sprints, Hurdles, Middle/Long
-distance, Relays, Jumps, Throws, Combined events).
-Die Dummy-Seite hat bisher: Sport, Gender, Division, Academic Status, Start, Freitextsuche.
+Alle Sportarten: Gender · Coaching Division · Academic Status · GPA · TOEFL · Duolingo · SAT ·
+Start of studies (Jahr). Zusätzlich **Soccer:** Athlete Position · **Track & Field:** Sprints, Hurdles,
+Middle distance, Long distance, Relays, Jumps, Throws, Combined events. Dazu Freitextsuche.
+
+Abgleich mit der Live-Seite (14.10.2026):
+
+| Filter | Ergebnis |
+|---|---|
+| Soccer-Position | **identisch** (Kürzel aus der Liste: GK, CB, LB, RB, CM, LM, RM, AM, F) |
+| GPA | **identisch**: Treffer, wenn sich die GPA-Spanne des Athleten mit dem Bereich überschneidet („3.2-3.5“ zählt zu 3.7-3.3 *und* 3.3-3.0) |
+| TOEFL, SAT, Start of studies, Middle/Long distance | **auf der Live-Seite wirkungslos** (zeigen immer alle Profile) – bei uns funktionsfähig |
+| Duolingo | **Live-Fehler:** sendet den TOEFL-Parameter – bei uns eigener Duolingo-Filter |
+| Track-&-Field-Disziplinen | **ähnlich, nicht identisch:** Live nutzt ein internes, nicht öffentliches Disziplinfeld. Wir werten die im Profil sichtbaren Felder „Disciplines“ und „Further disciplines“ aus |
+
+Werte, die ein Testdatum statt eines Scores enthalten (z. B. „November 2026“), werden bei
+TOEFL/Duolingo/SAT nicht gefiltert. SAT = SAT: CR + SAT: M.
