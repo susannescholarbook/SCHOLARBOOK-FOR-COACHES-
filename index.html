@@ -262,7 +262,17 @@
           <label for="coach-message">Message <span class="optional">(optional)</span></label>
           <textarea id="coach-message" name="message" rows="4" placeholder="Tell us about your program, roster needs, or questions about this athlete&hellip;"></textarea>
         </div>
-        <p class="form-hint">Attachments: please add files to the email that opens after sending.</p>
+        <div class="form-field" id="attachment-field" hidden>
+          <label for="coach-attachment">Attachment <span class="optional">(optional · PDF, JPG, PNG, DOCX · max. 5 MB)</span></label>
+          <input type="file" id="coach-attachment" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.docx">
+        </div>
+        <!-- Spam trap: hidden from visitors, bots fill it in -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="company-website">Company website</label>
+          <input type="text" id="company-website" name="company_website" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="form-hint" id="attachment-hint">Attachments: please add files to the email that opens after sending.</p>
+        <p class="form-status" id="recruit-status" role="status" hidden></p>
         <button type="submit" class="btn-primary">Send inquiry</button>
       </form>
     </div>

@@ -856,13 +856,20 @@ const athletes = [
 if (Array.isArray(window.LOCAL_ATHLETES)) athletes.push(...window.LOCAL_ATHLETES);
 
 /**
- * Optional live data source: URL returning { athletes: [...] } in the FELDER.md format
- * (planned: endpoint of the WordPress plugin).
- * Empty → demo data only. For tests without editing: index.html?api=<webhook URL>
+ * Set by the WordPress plugin "Scholarbook For Coaches – New Design" (window.SBFC):
+ * { dataUrl, contactUrl, contactAction, formTs, formSig, maxUploadMb }.
+ * Without it (GitHub test page) the demo profiles are shown and the form opens an email.
  */
-const ATHLETES_API_URL = "";
+const SBFC = window.SBFC || null;
+
+/**
+ * Live data source: URL returning { athletes: [...] } in the FELDER.md format.
+ * Empty → demo data only. For tests without editing: index.html?api=<URL>
+ */
+const ATHLETES_API_URL = SBFC ? SBFC.dataUrl : "";
 
 function apiUrl() {
+  if (SBFC) return ATHLETES_API_URL;
   try {
     const override = new URLSearchParams(window.location.search).get("api");
     if (override && /^(https:\/\/|http:\/\/localhost[:/])/i.test(override)) return override;
@@ -956,6 +963,18 @@ async function init() {
   try {
     setAthletes(await loadLiveAthletes(url));
   } catch (e) {
+    if (SBFC) {
+      // Live page: never fall back to the fictional demo profiles
+      console.warn("Athlete data unavailable:", e);
+      setAthletes([]);
+      els.count.textContent = "0";
+      els.grid.innerHTML = `
+        <div class="empty-state">
+          <h3>Profiles are temporarily unavailable</h3>
+          <p>Please try again in a few minutes or contact us at team@scholarbook.net.</p>
+        </div>`;
+      return;
+    }
     console.warn("Live athlete data unavailable, showing demo profiles:", e);
     setAthletes(athletes);
     showDataNotice("Live data is currently unavailable – showing demo profiles.");
@@ -1568,7 +1587,48 @@ function openRecruit(a) {
   els.recruitTitle.textContent = `I am interested in ${a.name}`;
   els.recruitLabel.textContent = `${a.name} · ${a.sport} · ${headline(a)}`;
   els.recruitForm.reset();
+  // In WordPress the form is sent by the server (with attachment); otherwise via the email program
+  document.getElementById("attachment-field").hidden = !SBFC;
+  document.getElementById("attachment-hint").hidden = Boolean(SBFC);
+  setFormStatus("");
+  els.recruitForm.querySelector('[type="submit"]').disabled = false;
   els.recruitModal.showModal();
+}
+
+function setFormStatus(message, type) {
+  const el = document.getElementById("recruit-status");
+  el.textContent = message;
+  el.className = `form-status${type ? ` form-status--${type}` : ""}`;
+  el.hidden = !message;
+}
+
+async function submitToServer(a) {
+  const form = els.recruitForm;
+  const submit = form.querySelector('[type="submit"]');
+  const file = document.getElementById("coach-attachment").files[0];
+  if (file && file.size > SBFC.maxUploadMb * 1024 * 1024) {
+    setFormStatus(`The attachment is larger than ${SBFC.maxUploadMb} MB.`, "error");
+    return;
+  }
+  const data = new FormData(form);
+  data.set("action", SBFC.contactAction);
+  data.set("athlete_id", a.id);
+  data.set("sbfc_ts", SBFC.formTs);
+  data.set("sbfc_sig", SBFC.formSig);
+  submit.disabled = true;
+  setFormStatus("Sending…");
+  try {
+    const res = await fetch(SBFC.contactUrl, { method: "POST", body: data, credentials: "same-origin" });
+    const json = await res.json().catch(() => null);
+    if (!json || !json.success) {
+      throw new Error((json && json.data && json.data.message) || "Your inquiry could not be sent. Please email us at team@scholarbook.net.");
+    }
+    form.reset();
+    setFormStatus(json.data.message, "success");
+  } catch (e) {
+    setFormStatus(e.message, "error");
+    submit.disabled = false;
+  }
 }
 
 /**
@@ -1644,6 +1704,10 @@ function closeVideo() {
 function onRecruitSubmit(e) {
   e.preventDefault();
   if (!selectedAthlete) return;
+  if (SBFC) {
+    submitToServer(selectedAthlete);
+    return;
+  }
 
   const value = (id) => document.getElementById(id).value.trim() || "(not provided)";
   const a = selectedAthlete;
